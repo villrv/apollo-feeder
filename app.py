@@ -18,9 +18,9 @@ def give_treat():
     else:
         message = "No more treats left for today!"
 
-    bones = '🍩 ' * treats_left  # Display the remaining treats as dog paw emojis
+    bones = '🍖 ' * treats_left  # Display the remaining treats as dog bone emojis
 
     return jsonify({'treats_left': bones.strip(), 'message': message})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8080)
