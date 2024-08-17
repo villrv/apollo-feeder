@@ -49,10 +49,11 @@ def reset_ip_tracking():
 
 def set_servo_angle(angle):
     """Set the servo to the desired angle."""
+    # Adjust this formula if necessary to match your servo's behavior
     duty = 2.5 + (angle / 18.0)  # Calculate duty cycle for the desired angle
     GPIO.output(17, True)
     servo.ChangeDutyCycle(duty)
-    time.sleep(1)  # Allow the servo to move
+    time.sleep(0.5)  # Shorter delay, more responsive
     GPIO.output(17, False)
     servo.ChangeDutyCycle(0)
 
@@ -60,8 +61,8 @@ def increment_servo_angle():
     """Rotate the servo by 30 degrees."""
     global current_angle
     current_angle += 30  # Increment by 30 degrees
-    if current_angle >= 180:  # Reset to 0 degrees after a full rotation
-        current_angle = 0
+    if current_angle >= 180:  # Prevent going beyond 180 degrees
+        current_angle = 180
     set_servo_angle(current_angle)
 
 @app.route('/')
