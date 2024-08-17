@@ -65,6 +65,9 @@ def give_treat():
     # Load the list of IP addresses that have fed Apollo today
     fed_ips = load_ip_addresses()
 
+    # Ignore "127.0.0.1" (loopback address) if it's in the list
+    fed_ips.discard("127.0.0.1")
+
     # Check if this IP address has already fed Apollo today
     if user_ip in fed_ips:
         return jsonify({'error': 'You have already fed Apollo today!'}), 403
