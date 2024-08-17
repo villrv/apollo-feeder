@@ -6,36 +6,51 @@ import os
 # Load environment variables from the .env file
 load_dotenv()
 
-# Get the public IP address from the environment variable
-public_ip = os.getenv('PUBLIC_IP')
+# Determine whether to use the local IP or public IP
+use_local_ip = os.getenv('USE_LOCAL_IP', 'True') == 'True'
 
-# The URL you want to encode in the QR code
-url = f"http://{public_ip}:8080/"
+# Select the appropriate IP address
+if use_local_ip:
+    ip_address = os.getenv('LOCAL_IP')
+else:
+    ip_address = os.getenv('PUBLIC_IP')
 
-# Generate the QR code
-qr = qrcode.QRCode(
-    version=1,
-    error_correction=qrcode.constants.ERROR_CORRECT_H,  # High error correction to support image overlay
-    box_size=10,
-    border=4,
-)
-qr.add_data(url)
-qr.make(fit=True)
+def generate_qr_code():
+    """Generate a QR code using the OTP stored in current_qr_code.txt and overlay a poodle image."""
+    # Read the OTP from the file
+    try:
+        with open("current_qr_code.txt", "r") as file:
+            otp = file.read().strip()
+    except FileNotFoundError:
+        print("Error: current_qr_code.txt not found.")
+        return
 
-# Create an image from the QR code
-img_qr = qr.make_image(fill='black', back_color='white').convert('RGB')
+    # Create the URL with the OTP as a query parameter
+    url_with_otp = f"http://{ip_address}:8080/?otp={otp}"
 
-# Open the poodle image and resize it
-poodle = Image.open("poodle.png")  # Make sure this is the path to your poodle image
-poodle = poodle.resize((50, 50))  # Adjust the size as needed
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(url_with_otp)
+    qr.make(fit=True)
 
-# Calculate the position to paste the poodle image
-pos = ((img_qr.size[0] - poodle.size[0]) // 2, (img_qr.size[1] - poodle.size[1]) // 2)
+    img_qr = qr.make_image(fill='black', back_color='white').convert('RGB')
 
-# Paste the poodle image onto the QR code
-img_qr.paste(poodle, pos, mask=poodle)
+    # Open the poodle image and resize it
+    poodle = Image.open("poodle.png")
+    poodle = poodle.resize((50, 50))
 
-# Save the final QR code image
-img_qr.save("dog_feeder_qr_with_poodle.png")
+    pos = ((img_qr.size[0] - poodle.size[0]) // 2, (img_qr.size[1] - poodle.size[1]) // 2)
+    img_qr.paste(poodle, pos, mask=poodle)
 
-print("QR code with poodle image generated and saved as 'dog_feeder_qr_with_poodle.png'")
+    # Save the final QR code image
+    filename = "qr_code.png"
+    img_qr.save(filename)
+    
+    print(f"QR code generated and saved as {filename} with URL: {url_with_otp}")
+
+if __name__ == "__main__":
+    generate_qr_code()
