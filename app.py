@@ -1,8 +1,8 @@
-from flask import Flask, render_template, jsonify, request, redirect, url_for
-import random
-import string
+from flask import Flask, render_template, jsonify, request
 import os
 from datetime import datetime
+import RPi.GPIO as GPIO
+import time
 
 app = Flask(__name__)
 
@@ -11,6 +11,14 @@ treats_left = 5
 
 # File to store IP addresses of users who have fed Apollo today
 IP_TRACKING_FILE = "fed_ip_addresses.txt"
+
+# Set up GPIO
+GPIO.setmode(GPIO.BCM)  # Use Broadcom pin numbering
+GPIO.setup(17, GPIO.OUT)  # Set GPIO pin 17 as output
+
+# Set up PWM on the GPIO pin for the servo
+servo = GPIO.PWM(17, 50)  # GPIO 17 for PWM with 50Hz frequency
+servo.start(0)  # Initialize PWM with 0% duty cycle
 
 def get_current_date():
     """Returns the current date in YYYY-MM-DD format."""
@@ -36,11 +44,18 @@ def reset_ip_tracking():
     with open(IP_TRACKING_FILE, 'w') as file:
         file.write(f"{get_current_date()}\n")
 
+def move_servo():
+    """Move the servo to 90 degrees, then back to 0 degrees."""
+    servo.ChangeDutyCycle(7.5)  # 90 degrees (depends on the servo)
+    time.sleep(1)  # Wait for 1 second
+    servo.ChangeDutyCycle(2.5)  # 0 degrees
+    time.sleep(1)
+    servo.ChangeDutyCycle(0)  # Turn off PWM signal
+
 @app.route('/')
 def home():
     bones = '🍩 ' * treats_left  # Display the remaining treats as doughnut emojis
     return render_template('index.html', treats=bones.strip())
-
 
 @app.route('/give_treat', methods=['POST'])
 def give_treat():
@@ -61,12 +76,12 @@ def give_treat():
         treats_left -= 1
         message = "Apollo got a treat!"
         save_ip_address(user_ip)
+        move_servo()  # Move the servo to dispense the treat
         bones = '🍩 ' * treats_left  # Display the remaining treats as dog bone emojis
         return jsonify({'treats_left': bones.strip(), 'message': message})
     else:
         message = "No more treats left for today!"
         return jsonify({'error': message}), 403
-
 
 @app.route('/thank_you')
 def thank_you():
@@ -75,4 +90,9 @@ def thank_you():
 if __name__ == '__main__':
     # Reset IP tracking at the start of the application
     reset_ip_tracking()
-    app.run(host='0.0.0.0', port=8080)
+    try:
+        app.run(host='0.0.0.0', port=8080)
+    finally:
+        # Cleanup GPIO on exit
+        servo.stop()
+        GPIO.cleanup()
