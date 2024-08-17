@@ -44,11 +44,13 @@ def reset_ip_tracking():
     with open(IP_TRACKING_FILE, 'w') as file:
         file.write(f"{get_current_date()}\n")
 
-def rotate_servo():
-    """Rotate the servo for a short duration."""
-    servo.ChangeDutyCycle(7.5)  # Set speed and direction (adjust as needed)
-    time.sleep(0.5)  # Rotate for 0.5 seconds
-    servo.ChangeDutyCycle(0)  # Stop the servo
+def rotate_servo_for_time(duration=0.1):
+    """Rotate the servo for a specific time to approximate a 30-degree movement."""
+    servo.ChangeDutyCycle(7.0)  # Slightly below neutral for slow forward rotation
+    time.sleep(duration)  # Run for a specific duration
+    servo.ChangeDutyCycle(7.1)  # Return to neutral position to stop
+    time.sleep(0.1)  # Allow time for the servo to stabilize
+    servo.ChangeDutyCycle(0)  # Turn off the PWM signal
 
 @app.route('/')
 def home():
@@ -67,6 +69,7 @@ def give_treat():
 
     # Ignore "127.0.0.1" (loopback address) if it's in the list
     fed_ips.discard("127.0.0.1")
+    fed_ips.discard("192.168.86.1")
 
     # Check if this IP address has already fed Apollo today
     if user_ip in fed_ips:
@@ -77,7 +80,7 @@ def give_treat():
         treats_left -= 1
         message = "Apollo got a treat!"
         save_ip_address(user_ip)
-        rotate_servo()  # Rotate the servo
+        rotate_servo_for_time()  # Rotate the servo
         bones = '🍩 ' * treats_left  # Display the remaining treats as dog bone emojis
         return jsonify({'treats_left': bones.strip(), 'message': message})
     else:
