@@ -58,11 +58,11 @@ def set_servo_angle(angle):
     servo.ChangeDutyCycle(0)
 
 def increment_servo_angle():
-    """Rotate the servo by 30 degrees."""
+    """Rotate the servo by 30 degrees from its current position."""
     global current_angle
     current_angle += 30  # Increment by 30 degrees
-    if current_angle >= 180:  # Prevent going beyond 180 degrees
-        current_angle = 180
+    if current_angle > 180:  # If angle exceeds 180, reset to 0 to avoid over-rotation
+        current_angle = current_angle % 180  # Start from 0 again after 180 degrees
     set_servo_angle(current_angle)
 
 @app.route('/')
