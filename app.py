@@ -9,9 +9,6 @@ app = Flask(__name__)
 # Variable to track the number of treats left
 treats_left = 5
 
-# Track the current angle of the servo
-current_angle = 0
-
 # File to store IP addresses of users who have fed Apollo today
 IP_TRACKING_FILE = "fed_ip_addresses.txt"
 
@@ -47,23 +44,11 @@ def reset_ip_tracking():
     with open(IP_TRACKING_FILE, 'w') as file:
         file.write(f"{get_current_date()}\n")
 
-def set_servo_angle(angle):
-    """Set the servo to the desired angle."""
-    # Adjust this formula if necessary to match your servo's behavior
-    duty = 2.5 + (angle / 18.0)  # Calculate duty cycle for the desired angle
-    GPIO.output(17, True)
-    servo.ChangeDutyCycle(duty)
-    time.sleep(0.5)  # Shorter delay, more responsive
-    GPIO.output(17, False)
-    servo.ChangeDutyCycle(0)
-
-def increment_servo_angle():
-    """Rotate the servo by 30 degrees from its current position."""
-    global current_angle
-    current_angle += 30  # Increment by 30 degrees
-    if current_angle > 180:  # If angle exceeds 180, reset to 0 to avoid over-rotation
-        current_angle = current_angle % 180  # Start from 0 again after 180 degrees
-    set_servo_angle(current_angle)
+def rotate_servo():
+    """Rotate the servo for a short duration."""
+    servo.ChangeDutyCycle(7.5)  # Set speed and direction (adjust as needed)
+    time.sleep(0.5)  # Rotate for 0.5 seconds
+    servo.ChangeDutyCycle(0)  # Stop the servo
 
 @app.route('/')
 def home():
@@ -89,7 +74,7 @@ def give_treat():
         treats_left -= 1
         message = "Apollo got a treat!"
         save_ip_address(user_ip)
-        increment_servo_angle()  # Rotate the servo by 30 degrees
+        rotate_servo()  # Rotate the servo
         bones = '🍩 ' * treats_left  # Display the remaining treats as dog bone emojis
         return jsonify({'treats_left': bones.strip(), 'message': message})
     else:
