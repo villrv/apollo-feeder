@@ -64,6 +64,35 @@
         .bone-button:active {
             background-color: #CC9900;
         }
+
+        /* Custom Pop-Up Styling */
+        #popup {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #FFF;
+            padding: 20px;
+            border: 2px solid #FFCC66;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        #popup button {
+            background-color: #FFCC66;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            color: #FFF;
+            cursor: pointer;
+        }
+
+        #popup button:hover {
+            background-color: #FFA500;
+        }
+
     </style>
 </head>
 <body>
@@ -71,6 +100,11 @@
     <p>Remaining Treats: <span id="treat-count">{{ treats }}</span></p>
 
     <button id="feed-button" class="bone-button">Give Treat</button>
+
+    <div id="popup">
+        <p id="popup-message"></p>
+        <button id="close-popup">Close</button>
+    </div>
 
     <script>
         document.getElementById('feed-button').addEventListener('click', function () {
@@ -91,11 +125,20 @@
             })
             .then(data => {
                 document.getElementById('treat-count').innerText = data.treats_left;
-                alert(data.message);
+                showPopup(data.message);
             })
             .catch(error => {
-                alert(error.message);
+                showPopup(error.message);
             });
+        });
+
+        function showPopup(message) {
+            document.getElementById('popup-message').innerText = "Apollo says: " + message;
+            document.getElementById('popup').style.display = 'block';
+        }
+
+        document.getElementById('close-popup').addEventListener('click', function() {
+            document.getElementById('popup').style.display = 'none';
         });
     </script>
 </body>

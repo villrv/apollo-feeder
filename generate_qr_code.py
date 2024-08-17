@@ -8,6 +8,7 @@ load_dotenv()
 
 # Determine whether to use the local IP or public IP
 use_local_ip = os.getenv('USE_LOCAL_IP', 'True') == 'True'
+use_local_ip = False #hard coding b/c lazy
 
 # Select the appropriate IP address
 if use_local_ip:
@@ -16,25 +17,18 @@ else:
     ip_address = os.getenv('PUBLIC_IP')
 
 def generate_qr_code():
-    """Generate a QR code using the OTP stored in current_qr_code.txt and overlay a poodle image."""
-    # Read the OTP from the file
-    try:
-        with open("current_qr_code.txt", "r") as file:
-            otp = file.read().strip()
-    except FileNotFoundError:
-        print("Error: current_qr_code.txt not found.")
-        return
+    """Generate a QR code with the IP address and overlay a poodle image."""
+    # Create the URL with the IP address
+    url = f"http://{ip_address}:8080/"
 
-    # Create the URL with the OTP as a query parameter
-    url_with_otp = f"http://{ip_address}:8080/?otp={otp}"
-
+    # Generate the QR code
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_H,
-        box_size=10,
-        border=4,
+        box_size=15,
+        border=1,
     )
-    qr.add_data(url_with_otp)
+    qr.add_data(url)
     qr.make(fit=True)
 
     img_qr = qr.make_image(fill='black', back_color='white').convert('RGB')
@@ -50,7 +44,7 @@ def generate_qr_code():
     filename = "qr_code.png"
     img_qr.save(filename)
     
-    print(f"QR code generated and saved as {filename} with URL: {url_with_otp}")
+    print(f"QR code generated and saved as {filename} with URL: {url}")
 
 if __name__ == "__main__":
     generate_qr_code()
