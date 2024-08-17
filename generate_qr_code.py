@@ -1,8 +1,16 @@
 import qrcode
 from PIL import Image
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from the .env file
+load_dotenv()
+
+# Get the public IP address from the environment variable
+public_ip = os.getenv('PUBLIC_IP')
 
 # The URL you want to encode in the QR code
-url = "http://192.168.86.121:8080/"
+url = f"http://{public_ip}:8080/"
 
 # Generate the QR code
 qr = qrcode.QRCode(
