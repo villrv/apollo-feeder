@@ -44,13 +44,13 @@ def reset_ip_tracking():
     with open(IP_TRACKING_FILE, 'w') as file:
         file.write(f"{get_current_date()}\n")
 
-def rotate_servo_for_time(duration=0.1):
-    """Rotate the servo for a specific time to approximate a 30-degree movement."""
-    servo.ChangeDutyCycle(7.05)  # Slightly below neutral for slow forward rotation
-    time.sleep(duration)  # Run for a specific duration
-    servo.ChangeDutyCycle(7.1)  # Return to neutral position to stop
-    time.sleep(0.1)  # Allow time for the servo to stabilize
-    servo.ChangeDutyCycle(0)  # Turn off the PWM signal
+def set_servo_angle(angle):
+    """Set the servo to a specific angle."""
+    duty_cycle = 2.5 + (angle / 18.0)  # Convert angle to duty cycle
+    servo.ChangeDutyCycle(duty_cycle)
+    time.sleep(0.5)  # Give the servo time to reach the position
+    servo.ChangeDutyCycle(0)  # Stop the PWM signal
+
 
 @app.route('/')
 def home():
@@ -80,7 +80,10 @@ def give_treat():
         treats_left -= 1
         message = "Apollo got a treat!"
         save_ip_address(user_ip)
-        rotate_servo_for_time()  # Rotate the servo
+        set_servo_angle(36)  # Rotate the servo
+        time.sleep(1)
+        set_servo_angle(0)
+        time.sleep(1)
         bones = '🍩 ' * treats_left  # Display the remaining treats as dog bone emojis
         return jsonify({'treats_left': bones.strip(), 'message': message})
     else:
