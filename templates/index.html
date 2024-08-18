@@ -93,6 +93,25 @@
             background-color: #FFA500;
         }
 
+        /* Link Styling */
+        .feedback-link {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .feedback-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Image Styling */
+        .apollo-image {
+            margin-top: 30px;
+            max-width: 100%;
+            height: auto;
+        }
+
     </style>
 </head>
 <body>
@@ -105,6 +124,14 @@
         <p id="popup-message"></p>
         <button id="close-popup">Close</button>
     </div>
+
+    <!-- Google Form Link -->
+    <p>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfISOQprM4Hh7om69-7SvcUqM7ZxviBe-g-_Ch2rKHAGEEHRg/viewform?usp=sf_link" class="feedback-link">Questions? Feedback? <strong>Contact us!</strong></a>
+    </p>
+
+    <!-- Apollo Image -->
+    <img src="apollo-line.png" alt="Apollo" class="apollo-image">
 
     <script>
         document.getElementById('feed-button').addEventListener('click', function () {
@@ -133,7 +160,7 @@
         });
 
         function showPopup(message) {
-            document.getElementById('popup-message').innerText = "Apollo says: " + message;
+            document.getElementById('popup-message').innerText = message;
             document.getElementById('popup').style.display = 'block';
         }
 

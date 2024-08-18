@@ -46,7 +46,7 @@ def reset_ip_tracking():
 
 def rotate_servo_for_time(duration=0.1):
     """Rotate the servo for a specific time to approximate a 30-degree movement."""
-    servo.ChangeDutyCycle(7.0)  # Slightly below neutral for slow forward rotation
+    servo.ChangeDutyCycle(7.05)  # Slightly below neutral for slow forward rotation
     time.sleep(duration)  # Run for a specific duration
     servo.ChangeDutyCycle(7.1)  # Return to neutral position to stop
     time.sleep(0.1)  # Allow time for the servo to stabilize
