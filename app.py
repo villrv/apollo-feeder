@@ -3,6 +3,8 @@ import os
 from datetime import datetime
 import RPi.GPIO as GPIO
 import time
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 app = Flask(__name__)
 
@@ -51,6 +53,17 @@ def set_servo_angle(angle):
     time.sleep(0.5)  # Give the servo time to reach the position
     servo.ChangeDutyCycle(0)  # Stop the PWM signal
 
+def reset_treats():
+    """Resets the treat count and IP tracking daily at 3 AM ET."""
+    global treats_left
+    treats_left = 5
+    reset_ip_tracking()
+    print("Treats and IP tracking reset at 3 AM ET")
+
+# Schedule the reset_treats function to run daily at 3 AM ET
+scheduler = BackgroundScheduler()
+scheduler.add_job(reset_treats, CronTrigger(hour=3, minute=0, timezone='US/Eastern'))
+scheduler.start()
 
 @app.route('/')
 def home():
@@ -101,5 +114,6 @@ if __name__ == '__main__':
         app.run(host='0.0.0.0', port=8080)
     finally:
         # Cleanup GPIO on exit
+        scheduler.shutdown()
         servo.stop()
         GPIO.cleanup()
