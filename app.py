@@ -67,7 +67,7 @@ scheduler.start()
 
 @app.route('/')
 def home():
-    bones = '🍩 ' * treats_left  # Display the remaining treats as doughnut emojis
+    bones = '🍪 ' * treats_left  # Display the remaining treats as doughnut emojis
     return render_template('index.html', treats=bones.strip())
 
 @app.route('/give_treat', methods=['POST'])
@@ -97,7 +97,7 @@ def give_treat():
         time.sleep(1)
         set_servo_angle(0)
         time.sleep(1)
-        bones = '🍩 ' * treats_left  # Display the remaining treats as dog bone emojis
+        bones = '🍪 ' * treats_left  # Display the remaining treats as dog bone emojis
         return jsonify({'treats_left': bones.strip(), 'message': message})
     else:
         message = "No more treats left for today!"
