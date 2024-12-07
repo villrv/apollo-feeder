@@ -7,7 +7,7 @@
 
 import time
 from rpi_ws281x import *
-import argparse
+import argparse  
 
 # LED strip configuration:
 LED_COUNT      = 30     # Number of LED pixels.
