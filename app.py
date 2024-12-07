@@ -5,8 +5,12 @@ import RPi.GPIO as GPIO
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
+from rpi_ws281x import PixelStrip, Color  # For LEDs
 
 app = Flask(__name__)
+
+# **Debugging:** Replace servo call with an easy toggle
+enable_servo = False  # Toggle to enable/disable servo
 
 # Variable to track the number of treats left
 treats_left = 5
@@ -21,6 +25,26 @@ GPIO.setup(17, GPIO.OUT)  # Set GPIO pin 17 as output
 # Set up PWM on the GPIO pin for the servo
 servo = GPIO.PWM(17, 50)  # GPIO 17 for PWM with 50Hz frequency
 servo.start(0)  # Initialize PWM with 0% duty cycle
+
+# LED strip configuration:
+LED_COUNT = 100      # Number of LED pixels.
+LED_PIN = 18         # GPIO pin connected to the pixels (18 uses PWM!).
+LED_FREQ_HZ = 800000 # LED signal frequency in hertz (usually 800kHz)
+LED_DMA = 10         # DMA channel to use for generating a signal (try 10)
+LED_BRIGHTNESS = 65  # Set to 0 for darkest and 255 for brightest
+LED_INVERT = False   # True to invert the signal
+LED_CHANNEL = 0      # Use channel 0
+
+# Initialize the NeoPixel strip
+strip = PixelStrip(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
+strip.begin()
+
+def colorWipe(strip, color, wait_ms=50):
+    """Wipe color across display a pixel at a time."""
+    for i in range(strip.numPixels()):
+        strip.setPixelColor(i, color)
+        strip.show()
+        time.sleep(wait_ms / 1000.0)
 
 def get_current_date():
     """Returns the current date in YYYY-MM-DD format."""
@@ -67,7 +91,7 @@ scheduler.start()
 
 @app.route('/')
 def home():
-    bones = '🍪 ' * treats_left  # Display the remaining treats as doughnut emojis
+    bones = '🍪 ' * treats_left  # Display the remaining treats as emojis
     return render_template('index.html', treats=bones.strip())
 
 @app.route('/give_treat', methods=['POST'])
@@ -93,11 +117,19 @@ def give_treat():
         treats_left -= 1
         message = "Apollo got a treat!"
         save_ip_address(user_ip)
-        set_servo_angle(36)  # Rotate the servo
-        time.sleep(1)
-        set_servo_angle(0)
-        time.sleep(1)
-        bones = '🍪 ' * treats_left  # Display the remaining treats as dog bone emojis
+
+        if enable_servo:
+            set_servo_angle(36)  # Rotate the servo
+            time.sleep(1)
+            set_servo_angle(0)
+            time.sleep(1)
+
+        # Call the colorWipe animation when the button is pressed
+        colorWipe(strip, Color(255, 0, 0))  # Red wipe
+        colorWipe(strip, Color(0, 255, 0))  # Green wipe
+        colorWipe(strip, Color(0, 0, 255))  # Blue wipe
+
+        bones = '🍪 ' * treats_left  # Display the remaining treats as emojis
         return jsonify({'treats_left': bones.strip(), 'message': message})
     else:
         message = "No more treats left for today!"
