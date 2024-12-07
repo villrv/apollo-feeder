@@ -175,6 +175,17 @@ def explosion(strip, row_lengths, setup_delay=10, explosion_speed=1000):
         strip.setPixelColor(int(i), Color(0, 0, 0))  # Turn off
     strip.show()
 
+def reset_lights(strip, row_lengths):
+    """
+    Reset the LEDs to alternating red/green rows.
+    :param strip: The LED strip object.
+    :param row_lengths: Array of row lengths.
+    """
+    base_colors = [Color(255, 0, 0), Color(0, 255, 0)]  # Red and Green
+    for i in range(sum(row_lengths)):
+        strip.setPixelColor(i, base_colors[i % len(base_colors)])
+    strip.show()
+
 
 def generate_vibrant_color():
     """
@@ -316,7 +327,7 @@ def ripple_wave(strip, row_lengths, feeder_index=9, ripple_color=Color(255, 255,
         time.sleep(0.1)
 
 
-
+'''
 # Main program logic follows:
 if __name__ == '__main__':
     # Process arguments
@@ -361,3 +372,4 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         if args.clear:
             colorWipe(strip, Color(0,0,0), 10)
+'''

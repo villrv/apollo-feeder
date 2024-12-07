@@ -7,6 +7,10 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from rpi_ws281x import PixelStrip, Color  # For LEDs
 import threading
+from strandtest import *
+
+PICK ONE RANDOMLY FROM THESE in strandtest:
+rowChangeAndSparkle, explosion, fireworks, ripple_wave
 
 
 app = Flask(__name__)
@@ -41,12 +45,6 @@ LED_CHANNEL = 0      # Use channel 0
 strip = PixelStrip(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
 strip.begin()
 
-def colorWipe(strip, color, wait_ms=50):
-    """Wipe color across display a pixel at a time."""
-    for i in range(strip.numPixels()):
-        strip.setPixelColor(i, color)
-        strip.show()
-        time.sleep(wait_ms / 1000.0)
 
 def get_current_date():
     """Returns the current date in YYYY-MM-DD format."""
@@ -129,10 +127,18 @@ def give_treat():
                 set_servo_angle(0)
                 time.sleep(1)
 
-            # LED color wipe animation
-            colorWipe(strip, Color(255, 0, 0))  # Red wipe
-            colorWipe(strip, Color(0, 255, 0))  # Green wipe
-            colorWipe(strip, Color(0, 0, 255))  # Blue wipe
+            # Pick a random animation and run it
+            animations = [
+                lambda: rowChangeAndSparkle(strip, wait_ms=50, sparkle_time=5),
+                lambda: explosion(strip, row_lengths, setup_delay=10, explosion_speed=150),
+                lambda: fireworks(strip, row_lengths, num_fireworks=5, burst_delay=500, fade_time=3),
+                lambda: ripple_wave(strip, row_lengths, feeder_index=9, ripple_color=Color(255, 255, 128), speed=150)
+            ]
+            random.choice(animations)()  # Pick and run one animation randomly
+
+            # Reset the lights to red/green rows after the animation
+            reset_lights(strip, row_lengths)
+
 
         # Run treat dispensing and lights asynchronously
         threading.Thread(target=treat_and_lights).start()
