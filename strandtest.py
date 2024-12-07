@@ -78,6 +78,14 @@ def theaterChaseRainbow(strip, wait_ms=50):
             for i in range(0, strip.numPixels(), 3):
                 strip.setPixelColor(i+q, 0)
 
+def buildMatrix(strip, color, wait_ms=50):
+    """Wipe color across display a pixel at a time."""
+    row_1_length = 20
+    for i in range(row_1_length = 20):
+        strip.setPixelColor(i, color)
+        strip.show()
+        time.sleep(wait_ms/1000.0)
+
 # Main program logic follows:
 if __name__ == '__main__':
     # Process arguments
@@ -97,6 +105,10 @@ if __name__ == '__main__':
     try:
 
         while True:
+            print('custom tests')
+            buildMatrix(strip, Color(255, 0, 0))
+
+            '''
             print ('Color wipe animations.')
             colorWipe(strip, Color(255, 0, 0))  # Red wipe
             colorWipe(strip, Color(0, 255, 0))  # Blue wipe
@@ -109,6 +121,7 @@ if __name__ == '__main__':
             rainbow(strip)
             rainbowCycle(strip)
             theaterChaseRainbow(strip)
+            '''
 
     except KeyboardInterrupt:
         if args.clear:
