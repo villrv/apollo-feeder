@@ -6,6 +6,8 @@ import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from rpi_ws281x import PixelStrip, Color  # For LEDs
+import threading
+
 
 app = Flask(__name__)
 
@@ -118,22 +120,31 @@ def give_treat():
         message = "Apollo got a treat!"
         save_ip_address(user_ip)
 
-        if enable_servo:
-            set_servo_angle(36)  # Rotate the servo
-            time.sleep(1)
-            set_servo_angle(0)
-            time.sleep(1)
+        # Start the treat dispensing and LED animation in a separate thread
+        def treat_and_lights():
+            # Servo dispensing logic
+            if enable_servo:
+                set_servo_angle(36)  # Rotate the servo
+                time.sleep(1)
+                set_servo_angle(0)
+                time.sleep(1)
 
-        # Call the colorWipe animation when the button is pressed
-        colorWipe(strip, Color(255, 0, 0))  # Red wipe
-        colorWipe(strip, Color(0, 255, 0))  # Green wipe
-        colorWipe(strip, Color(0, 0, 255))  # Blue wipe
+            # LED color wipe animation
+            colorWipe(strip, Color(255, 0, 0))  # Red wipe
+            colorWipe(strip, Color(0, 255, 0))  # Green wipe
+            colorWipe(strip, Color(0, 0, 255))  # Blue wipe
 
+        # Run treat dispensing and lights asynchronously
+        threading.Thread(target=treat_and_lights).start()
+
+        # Immediately respond with a success message
         bones = '🍪 ' * treats_left  # Display the remaining treats as emojis
         return jsonify({'treats_left': bones.strip(), 'message': message})
+
     else:
         message = "No more treats left for today!"
         return jsonify({'error': message}), 403
+
 
 @app.route('/thank_you')
 def thank_you():
