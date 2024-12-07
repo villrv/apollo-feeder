@@ -111,14 +111,38 @@
             max-width: 100%;
             height: auto;
         }
+    .cane-button {
+        position: relative;
+        width: 150px; /* Width of the cane body */
+        height: 50px; /* Height of the cane body */
+        background: repeating-linear-gradient(
+            135deg,
+            rgba(255, 0, 0, 0.2), rgba(255, 0, 0, 0.2) 10px,
+            #FFFFFF 10px, #FFFFFF 20px
+        );
+        border-radius: 25px; /* Rounded edges for the body */
+        border: 2px solid #FF0000;
+        cursor: pointer;
+        outline: none;
+        transition: transform 0.3s ease;
+        font-weight: bold;
+    }
 
+    .cane-button:hover {
+        transform: scale(1.1); /* Slight zoom on hover */
+    }
+
+
+    .cane-button:active {
+        transform: scale(1.05) translateY(2px); /* Slight press-down effect */
+    }
     </style>
 </head>
 <body>
     <h1>Apollo's Feeder</h1>
     <p>Remaining Treats: <span id="treat-count">{{ treats }}</span></p>
 
-    <button id="feed-button" class="bone-button">Give Treat</button>
+    <button id="feed-button" class="cane-button">Give Treat</button>
 
     <div id="popup">
         <p id="popup-message"></p>
@@ -131,7 +155,7 @@
     </p>
 
     <!-- Apollo Image -->
-    <img src="../static/apollo-line.png" alt="Apollo" class="apollo-image">
+    <img src="../static/apollo-festive.gif" alt="Apollo" class="apollo-image">
 
     <script>
         document.getElementById('feed-button').addEventListener('click', function () {
