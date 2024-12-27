@@ -16,7 +16,7 @@ rowChangeAndSparkle, explosion, fireworks, ripple_wave
 app = Flask(__name__)
 
 # **Debugging:** Replace servo call with an easy toggle
-enable_servo = False  # Toggle to enable/disable servo
+enable_servo = True  # Toggle to enable/disable servo
 
 # Variable to track the number of treats left
 treats_left = 9
@@ -144,7 +144,7 @@ def give_treat():
         threading.Thread(target=treat_and_lights).start()
 
         # Immediately respond with a success message
-        bones = '🍪 ' * treats_left  # Display the remaining treats as emojis
+        bones = '🌟 ' * treats_left  # Display the remaining treats as emojis
         return jsonify({'treats_left': bones.strip(), 'message': message})
 
     else:
