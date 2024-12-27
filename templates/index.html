@@ -136,13 +136,43 @@
     .cane-button:active {
         transform: scale(1.05) translateY(2px); /* Slight press-down effect */
     }
+    .new-year-button {
+        position: relative;
+        width: 150px; /* Button width */
+        height: 50px; /* Button height */
+        background: linear-gradient(135deg, #f5f5f5, #d4af37); /* Subtle gold and silver gradient */
+        border-radius: 25px; /* Rounded corners */
+        border: 2px solid #d4af37; /* Gold border */
+        font-size: 16px;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: #333; /* Elegant dark text */
+        letter-spacing: 1px;
+        text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6); /* Subtle text shadow */
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    }
+
+    .new-year-button:hover {
+        background: linear-gradient(135deg, #ffffff, #f0c878); /* Brighter gradient on hover */
+        transform: scale(1.03); /* Gentle zoom */
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Slightly larger shadow */
+    }
+
+    .new-year-button:active {
+        transform: scale(0.98) translateY(2px); /* Subtle press-down effect */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Smaller shadow when pressed */
+        background: linear-gradient(135deg, #d4af37, #c0b283); /* Slightly darker gradient */
+    }
+
     </style>
 </head>
 <body>
     <h1>Apollo's Feeder</h1>
     <p>Remaining Treats: <span id="treat-count">{{ treats }}</span></p>
 
-    <button id="feed-button" class="cane-button">Give Treat</button>
+    <button id="feed-button" class="new-year-button">Give Treat</button>
 
     <div id="popup">
         <p id="popup-message"></p>
@@ -155,7 +185,7 @@
     </p>
 
     <!-- Apollo Image -->
-    <img src="../static/apollo-festive.gif" alt="Apollo" class="apollo-image">
+    <img src="../static/new-year-apollo.gif" alt="Apollo" class="apollo-image">
 
     <script>
         document.getElementById('feed-button').addEventListener('click', function () {

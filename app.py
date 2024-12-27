@@ -9,7 +9,7 @@ from rpi_ws281x import PixelStrip, Color  # For LEDs
 import threading
 from strandtest import *
 
-PICK ONE RANDOMLY FROM THESE in strandtest:
+# PICK ONE RANDOMLY FROM THESE in strandtest:
 rowChangeAndSparkle, explosion, fireworks, ripple_wave
 
 
@@ -19,7 +19,7 @@ app = Flask(__name__)
 enable_servo = False  # Toggle to enable/disable servo
 
 # Variable to track the number of treats left
-treats_left = 5
+treats_left = 9
 
 # File to store IP addresses of users who have fed Apollo today
 IP_TRACKING_FILE = "fed_ip_addresses.txt"
@@ -91,7 +91,7 @@ scheduler.start()
 
 @app.route('/')
 def home():
-    bones = '🍪 ' * treats_left  # Display the remaining treats as emojis
+    bones = '🌟 ' * treats_left  # Display the remaining treats as emojis
     return render_template('index.html', treats=bones.strip())
 
 @app.route('/give_treat', methods=['POST'])

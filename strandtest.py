@@ -354,7 +354,7 @@ if __name__ == '__main__':
             ripple_wave(strip, row_lengths, feeder_index=9, ripple_color=Color(255, 255, 128), speed=150)
 
 
-            '''
+            
             print ('Color wipe animations.')
             colorWipe(strip, Color(255, 0, 0))  # Red wipe
             colorWipe(strip, Color(0, 255, 0))  # Blue wipe
@@ -367,7 +367,7 @@ if __name__ == '__main__':
             rainbow(strip)
             rainbowCycle(strip)
             theaterChaseRainbow(strip)
-            '''
+            
 
     except KeyboardInterrupt:
         if args.clear:
