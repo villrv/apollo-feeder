@@ -16,7 +16,7 @@ rowChangeAndSparkle, explosion, fireworks, ripple_wave
 app = Flask(__name__)
 
 # **Debugging:** Replace servo call with an easy toggle
-enable_servo = True  # Toggle to enable/disable servo
+enable_servo = False  # Toggle to enable/disable servo
 
 # Variable to track the number of treats left
 treats_left = 9
@@ -80,7 +80,7 @@ def set_servo_angle(angle):
 def reset_treats():
     """Resets the treat count and IP tracking daily at 3 AM ET."""
     global treats_left
-    treats_left = 5
+    treats_left = 9
     reset_ip_tracking()
     print("Treats and IP tracking reset at 3 AM ET")
 
@@ -91,7 +91,7 @@ scheduler.start()
 
 @app.route('/')
 def home():
-    bones = '🌟 ' * treats_left  # Display the remaining treats as emojis
+    bones = '❤️ ' * treats_left  # Display the remaining treats as emojis
     return render_template('index.html', treats=bones.strip())
 
 @app.route('/give_treat', methods=['POST'])
@@ -122,9 +122,9 @@ def give_treat():
         def treat_and_lights():
             # Servo dispensing logic
             if enable_servo:
-                set_servo_angle(36)  # Rotate the servo
+                set_servo_angle(36+18)  # Rotate the servo
                 time.sleep(1)
-                set_servo_angle(0)
+                set_servo_angle(18)
                 time.sleep(1)
 
             # Pick a random animation and run it
@@ -144,7 +144,7 @@ def give_treat():
         threading.Thread(target=treat_and_lights).start()
 
         # Immediately respond with a success message
-        bones = '🌟 ' * treats_left  # Display the remaining treats as emojis
+        bones = '❤️ ' * treats_left  # Display the remaining treats as emojis
         return jsonify({'treats_left': bones.strip(), 'message': message})
 
     else:
