@@ -326,6 +326,76 @@ def ripple_wave(strip, row_lengths, feeder_index=9, ripple_color=Color(255, 255,
         strip.show()
         time.sleep(0.1)
 
+import numpy as np
+import time
+from rpi_ws281x import Color
+
+# HARD CODE ROW LENGTHS
+row_lengths = np.asarray([20, 16, 15, 14, 16, 19], dtype=int)
+
+def drawHeart(strip, heart_color=Color(255, 105, 180), wait_ms=50):
+    """
+    Lights up the LEDs in a heart shape pattern using a soft pink color.
+    Assumes a rough center alignment of rows.
+    
+    :param strip: LED strip object
+    :param heart_color: Color object for the heart (default: pink)
+    :param wait_ms: Delay for smooth animation (milliseconds)
+    """
+    
+    # Proper heart pattern (0 = off, 1 = lit)
+    heart_matrix = [
+        "00110011001100000000",  # Row 1 (20 LEDs)
+        "01111111111111000000",  # Row 2 (16 LEDs)
+        "01111111111111000000",  # Row 3 (15 LEDs)
+        "00111111111100000000",  # Row 4 (14 LEDs)
+        "00011111111000000000",  # Row 5 (16 LEDs)
+        "00001111110000000000",  # Row 6 (19 LEDs)
+    ]
+    
+    # Convert heart matrix to LED positions
+    for row_idx, row_pattern in enumerate(heart_matrix):
+        row_start = int(np.sum(row_lengths[:row_idx]))  # Start index of the row
+        row_leds = row_lengths[row_idx]  # Number of LEDs in this row
+        
+        # Trim to match actual row length
+        row_pattern = row_pattern[:row_leds]
+        
+        for char_idx, char in enumerate(row_pattern):
+            if char == '1':  # Light up only heart shape positions
+                strip.setPixelColor(row_start + char_idx, heart_color)
+                strip.show()
+                time.sleep(wait_ms / 1000.0)  # Smooth animation delay
+
+    # Hold the heart for a moment
+    time.sleep(2)
+
+    # Fade out effect
+    for brightness in range(255, 0, -15):
+        dim_color = Color(
+            (heart_color >> 16 & 0xFF) * brightness // 255,  # Red channel
+            (heart_color >> 8 & 0xFF) * brightness // 255,   # Green channel
+            (heart_color & 0xFF) * brightness // 255         # Blue channel
+        )
+        
+        for row_idx, row_pattern in enumerate(heart_matrix):
+            row_start = int(np.sum(row_lengths[:row_idx]))
+            row_leds = row_lengths[row_idx]
+            
+            row_pattern = row_pattern[:row_leds]
+            
+            for char_idx, char in enumerate(row_pattern):
+                if char == '1':
+                    strip.setPixelColor(row_start + char_idx, dim_color)
+        
+        strip.show()
+        time.sleep(0.1)  # Smooth dimming
+
+    # Clear the heart
+    for i in range(strip.numPixels()):
+        strip.setPixelColor(i, Color(0, 0, 0))  # Turn off all LEDs
+    strip.show()
+
 
 '''
 # Main program logic follows:
