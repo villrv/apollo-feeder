@@ -128,16 +128,16 @@ def give_treat():
                 time.sleep(1)
 
             # Pick a random animation and run it
-            animations = [
-                lambda: rowChangeAndSparkle(strip, wait_ms=50, sparkle_time=5),
-                lambda: explosion(strip, row_lengths, setup_delay=10, explosion_speed=150),
-                lambda: fireworks(strip, row_lengths, num_fireworks=5, burst_delay=500, fade_time=3),
-                lambda: ripple_wave(strip, row_lengths, feeder_index=9, ripple_color=Color(255, 255, 128), speed=150)
-            ]
+            #animations = [
+            #    lambda: rowChangeAndSparkle(strip, wait_ms=50, sparkle_time=5),
+            #    lambda: explosion(strip, row_lengths, setup_delay=10, explosion_speed=150),
+            #    lambda: fireworks(strip, row_lengths, num_fireworks=5, burst_delay=500, fade_time=3),
+            #    lambda: ripple_wave(strip, row_lengths, feeder_index=9, ripple_color=Color(255, 255, 128), speed=150)
+            #]
             random.choice(animations)()  # Pick and run one animation randomly
 
             # Reset the lights to red/green rows after the animation
-            reset_lights(strip, row_lengths)
+            #reset_lights(strip, row_lengths)
 
 
         # Run treat dispensing and lights asynchronously

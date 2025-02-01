@@ -325,14 +325,6 @@ def ripple_wave(strip, row_lengths, feeder_index=9, ripple_color=Color(255, 255,
         strip.setPixelColor(feeder_index, ripple_color)  # Restore ripple color
         strip.show()
         time.sleep(0.1)
-
-import numpy as np
-import time
-from rpi_ws281x import Color
-
-# HARD CODE ROW LENGTHS
-row_lengths = np.asarray([20, 16, 15, 14, 16, 19], dtype=int)
-
 def drawHeart(strip, heart_color=Color(255, 105, 180), wait_ms=50):
     """
     Lights up the LEDs in a heart shape pattern using a soft pink color.
