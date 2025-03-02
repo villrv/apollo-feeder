@@ -233,6 +233,12 @@
     }
 
     </style>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='ico/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='ico/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='ico/favicon-16x16.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='ico/favicon.ico') }}">
+
 </head>
 <body>
     <h1>Apollo's Feeder</h1>
@@ -251,7 +257,7 @@
     </p>
 
     <!-- Apollo Image -->
-    <img src="../static/Apollo_valentines.png" alt="Apollo" class="apollo-image">
+    <img src="/static/Apollo_valentines.png" alt="Apollo" class="apollo-image">
 
     <script>
         document.getElementById('feed-button').addEventListener('click', function () {

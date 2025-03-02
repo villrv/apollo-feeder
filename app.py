@@ -8,6 +8,7 @@ from apscheduler.triggers.cron import CronTrigger
 from rpi_ws281x import PixelStrip, Color  # For LEDs
 import threading
 from strandtest import *
+import atexit
 
 # PICK ONE RANDOMLY FROM THESE in strandtest:
 rowChangeAndSparkle, explosion, fireworks, ripple_wave
@@ -128,16 +129,16 @@ def give_treat():
                 time.sleep(1)
 
             # Pick a random animation and run it
-            #animations = [
-            #    lambda: rowChangeAndSparkle(strip, wait_ms=50, sparkle_time=5),
-            #    lambda: explosion(strip, row_lengths, setup_delay=10, explosion_speed=150),
-            #    lambda: fireworks(strip, row_lengths, num_fireworks=5, burst_delay=500, fade_time=3),
-            #    lambda: ripple_wave(strip, row_lengths, feeder_index=9, ripple_color=Color(255, 255, 128), speed=150)
-            #]
+            animations = [
+                # lambda: rowChangeAndSparkle(strip, wait_ms=50, sparkle_time=5),
+                # lambda: explosion(strip, row_lengths, setup_delay=10, explosion_speed=150),
+                # lambda: fireworks(strip, row_lengths, num_fireworks=5, burst_delay=500, fade_time=3),
+                lambda: ripple_wave(strip, row_lengths, feeder_index=9, ripple_color=Color(255, 255, 128), speed=150)
+            ]
             random.choice(animations)()  # Pick and run one animation randomly
 
             # Reset the lights to red/green rows after the animation
-            #reset_lights(strip, row_lengths)
+            reset_lights(strip, row_lengths)
 
 
         # Run treat dispensing and lights asynchronously
@@ -156,13 +157,18 @@ def give_treat():
 def thank_you():
     return "Apollo has been fed! Thanks!"
 
-if __name__ == '__main__':
-    # Reset IP tracking at the start of the application
+def startup():
     reset_ip_tracking()
-    try:
-        app.run(host='0.0.0.0', port=8080)
-    finally:
-        # Cleanup GPIO on exit
-        scheduler.shutdown()
-        servo.stop()
-        GPIO.cleanup()
+
+def cleanup():
+    # Cleanup GPIO on exit
+    scheduler.shutdown()
+    servo.stop()
+    GPIO.cleanup()
+
+# Reset IP tracking at the start of the application
+reset_ip_tracking()
+atexit.register(cleanup)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)

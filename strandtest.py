@@ -7,8 +7,7 @@
 
 import time
 from rpi_ws281x import *
-import argparse  
-import numpy as np
+import argparse
 import random
 # LED strip configuration:
 LED_COUNT      = 100     # Number of LED pixels.
@@ -80,7 +79,7 @@ def theaterChaseRainbow(strip, wait_ms=50):
                 strip.setPixelColor(i+q, 0)
 
 # HARD CODE ROW LENGTHS
-row_lengths = np.asarray([20, 16, 15, 14, 16, 19], dtype=int)
+row_lengths = [20, 16, 15, 14, 16, 19]
 
 def rowChangeAndSparkle(strip, wait_ms=50, sparkle_time=2):
     """Light up rows top to bottom in alternating colors, then randomly sparkle with white."""
@@ -89,7 +88,7 @@ def rowChangeAndSparkle(strip, wait_ms=50, sparkle_time=2):
     
     # Top to bottom lighting
     for i in reversed(range(len(row_lengths))):  # Reverse the row index order
-        row_start = int(np.sum(row_lengths[:i]))  # Starting index of the current row
+        row_start = int(sum(row_lengths[:i]))  # Starting index of the current row
         row_end = row_start + row_lengths[i]      # Ending index of the current row
         
         # Get the current color (alternate between red and green)
@@ -117,7 +116,7 @@ def rowChangeAndSparkle(strip, wait_ms=50, sparkle_time=2):
         strip.show()
 
     for i,row in enumerate(row_lengths):
-        current_ind = int(np.sum(row_lengths[0:i]))
+        current_ind = int(sum(row_lengths[0:i]))
         for j in range(row):
             strip.setPixelColor(int(j+current_ind), color)
             strip.show()
@@ -131,7 +130,7 @@ def explosion(strip, row_lengths, setup_delay=10, explosion_speed=1000):
 
     # 1. Light rows in alternating red and green (quickly)
     for i in range(len(row_lengths)):  # Top-to-bottom row order
-        row_start = int(np.sum(row_lengths[:i]))  # Start index of the current row
+        row_start = int(sum(row_lengths[:i]))  # Start index of the current row
         row_end = row_start + int(row_lengths[i])  # End index of the current row
         
         color = colors[i % 2]  # Alternate between red and green
@@ -143,7 +142,7 @@ def explosion(strip, row_lengths, setup_delay=10, explosion_speed=1000):
     # 2. Calculate the middle row for vertical explosion
     total_rows = len(row_lengths)
     middle_row = total_rows // 2  # Middle row index
-    total_leds = int(np.sum(row_lengths))  # Total number of LEDs
+    total_leds = int(sum(row_lengths))  # Total number of LEDs
 
     # Create an explosion that propagates both vertically and horizontally
     max_radius = max(row_lengths)  # Determine the maximum radius for explosion
@@ -153,7 +152,7 @@ def explosion(strip, row_lengths, setup_delay=10, explosion_speed=1000):
             for direction in [-1, 1]:  # Upward (-1) and downward (+1)
                 current_row = middle_row + direction * row_offset
                 if 0 <= current_row < total_rows:
-                    row_start = int(np.sum(row_lengths[:current_row]))
+                    row_start = int(sum(row_lengths[:current_row]))
                     row_middle = row_start + (int(row_lengths[current_row]) // 2)
                     row_end = row_start + int(row_lengths[current_row])
                     
@@ -347,7 +346,7 @@ def drawHeart(strip, heart_color=Color(255, 105, 180), wait_ms=50):
     
     # Convert heart matrix to LED positions
     for row_idx, row_pattern in enumerate(heart_matrix):
-        row_start = int(np.sum(row_lengths[:row_idx]))  # Start index of the row
+        row_start = int(sum(row_lengths[:row_idx]))  # Start index of the row
         row_leds = row_lengths[row_idx]  # Number of LEDs in this row
         
         # Trim to match actual row length
@@ -371,7 +370,7 @@ def drawHeart(strip, heart_color=Color(255, 105, 180), wait_ms=50):
         )
         
         for row_idx, row_pattern in enumerate(heart_matrix):
-            row_start = int(np.sum(row_lengths[:row_idx]))
+            row_start = int(sum(row_lengths[:row_idx]))
             row_leds = row_lengths[row_idx]
             
             row_pattern = row_pattern[:row_leds]
