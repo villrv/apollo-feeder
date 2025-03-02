@@ -11,7 +11,7 @@ from apscheduler.triggers.cron import CronTrigger
 from flask import Flask, jsonify, render_template, request
 from rpi_ws281x import Color, PixelStrip  # For LEDs
 
-from . import strand
+import strand
 
 DEFAULT_TREATS = 5
 
