@@ -9,9 +9,11 @@ import RPi.GPIO as GPIO
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from flask import Flask, jsonify, render_template, request
-from rpi_ws281x import Color, PixelStrip  # For LEDs
+from rpi_ws281x import PixelStrip  # For LEDs
 
 import strand
+
+from strand import Color
 
 DEFAULT_TREATS = 5
 BASE_COLORS = [
