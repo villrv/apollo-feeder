@@ -11,13 +11,8 @@ import time
 from rpi_ws281x import PixelStrip
 from rpi_ws281x import Color as rpiColor
 
-class Color(rpiColor):
-    def __init__(self, r, g, b, w=0, brightness=0.1):
-        r = int(r * brightness)
-        g = int(g * brightness)
-        b = int(b * brightness)
-        w = int(w * brightness)
-        super().__init__(r, g, b, w=w)
+def Color(r, g, b, w=0, brightness=0.1):
+    return rpiColor(int(r * brightness), int(g * brightness), int(b * brightness), int(w * brightness))
 
 # LED strip configuration:
 LED_COUNT = 100  # Number of LED pixels.
