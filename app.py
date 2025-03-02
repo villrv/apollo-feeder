@@ -11,14 +11,9 @@ from apscheduler.triggers.cron import CronTrigger
 from flask import Flask, jsonify, render_template, request
 from rpi_ws281x import Color, PixelStrip  # For LEDs
 
-from strand import (
-    explosion,
-    fireworks,
-    reset_lights,
-    ripple_wave,
-    row_lengths,
-    rowChangeAndSparkle,
-)
+from . import strand
+
+DEFAULT_TREATS = 5
 
 app = Flask(__name__)
 
@@ -26,7 +21,7 @@ app = Flask(__name__)
 enable_servo = False  # Toggle to enable/disable servo
 
 # Variable to track the number of treats left
-treats_left = 9
+treats_left = DEFAULT_TREATS
 
 # File to store IP addresses of users who have fed Apollo today
 IP_TRACKING_FILE = "fed_ip_addresses.txt"
@@ -94,7 +89,7 @@ def set_servo_angle(angle):
 def reset_treats():
     """Resets the treat count and IP tracking daily at 3 AM ET."""
     global treats_left
-    treats_left = 9
+    treats_left = DEFAULT_TREATS
     reset_ip_tracking()
     print("Treats and IP tracking reset at 3 AM ET")
 
@@ -149,9 +144,9 @@ def give_treat():
                 # lambda: rowChangeAndSparkle(strip, wait_ms=50, sparkle_time=5),
                 # lambda: explosion(strip, row_lengths, setup_delay=10, explosion_speed=150),
                 # lambda: fireworks(strip, row_lengths, num_fireworks=5, burst_delay=500, fade_time=3),
-                lambda: ripple_wave(
+                lambda: strand.ripple_wave(
                     strip,
-                    row_lengths,
+                    strand.row_lengths,
                     feeder_index=9,
                     ripple_color=Color(255, 255, 128),
                     speed=150,
@@ -160,7 +155,10 @@ def give_treat():
             random.choice(animations)()  # Pick and run one animation randomly
 
             # Reset the lights to red/green rows after the animation
-            reset_lights(strip, row_lengths)
+            # strand.reset_lights(strip, row_lengths)
+
+            # Turn lights off
+            strand.off(strip)
 
         # Run treat dispensing and lights asynchronously
         threading.Thread(target=treat_and_lights).start()

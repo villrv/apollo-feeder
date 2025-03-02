@@ -8,7 +8,7 @@
 import random
 import time
 
-from rpi_ws281x import Color
+from rpi_ws281x import Color, PixelStrip
 
 # LED strip configuration:
 LED_COUNT = 100  # Number of LED pixels.
@@ -194,7 +194,7 @@ def explosion(strip, row_lengths, setup_delay=10, explosion_speed=1000):
     strip.show()
 
 
-def reset_lights(strip, row_lengths):
+def reset_lights(strip: PixelStrip, row_lengths):
     """
     Reset the LEDs to alternating red/green rows.
     :param strip: The LED strip object.
@@ -205,6 +205,14 @@ def reset_lights(strip, row_lengths):
         strip.setPixelColor(i, base_colors[i % len(base_colors)])
     strip.show()
 
+def off(strip: PixelStrip):
+    """
+    Turn off all LEDs.
+    :param strip: The LED strip object.
+    """
+    for i in range(strip.numPixels()):
+        strip.setPixelColor(i, Color(0, 0, 0))  # Turn off
+    strip.show()
 
 def generate_vibrant_color():
     """
