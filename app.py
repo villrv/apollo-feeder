@@ -1,5 +1,6 @@
 import atexit
 import os
+import random
 import threading
 import time
 from datetime import datetime
@@ -10,11 +11,14 @@ from apscheduler.triggers.cron import CronTrigger
 from flask import Flask, jsonify, render_template, request
 from rpi_ws281x import Color, PixelStrip  # For LEDs
 
-from strandtest import *
-
-# PICK ONE RANDOMLY FROM THESE in strandtest:
-rowChangeAndSparkle, explosion, fireworks, ripple_wave
-
+from strand import (
+    explosion,
+    fireworks,
+    reset_lights,
+    ripple_wave,
+    row_lengths,
+    rowChangeAndSparkle,
+)
 
 app = Flask(__name__)
 
