@@ -178,6 +178,7 @@ def thank_you():
 
 
 def startup():
+    strand.off(strip)
     reset_ip_tracking()
 
 
@@ -189,7 +190,7 @@ def cleanup():
 
 
 # Reset IP tracking at the start of the application
-reset_ip_tracking()
+startup()
 atexit.register(cleanup)
 
 if __name__ == "__main__":
