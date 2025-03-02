@@ -15,11 +15,18 @@ import strand
 
 from strand import Color
 
+#####
+
 DEFAULT_TREATS = 5
 BASE_COLORS = [
     Color(255, 0, 255),  # pink
     Color(255, 255, 255),  # white
 ]
+DEFAULT_BRIGHTNESS = 0.1
+
+#####
+
+strand.DEFAULT_BRIGHTNESS = 0.1
 
 app = Flask(__name__)
 

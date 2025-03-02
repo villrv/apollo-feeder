@@ -8,11 +8,23 @@
 import random
 import time
 
-from rpi_ws281x import PixelStrip
 from rpi_ws281x import Color as rpiColor
+from rpi_ws281x import PixelStrip
 
-def Color(r, g, b, w=0, brightness=0.1):
-    return rpiColor(int(r * brightness), int(g * brightness), int(b * brightness), int(w * brightness))
+DEFAULT_BRIGHTNESS = 1.0
+
+
+def Color(r, g, b, w=0, brightness=None):
+    if brightness is None:
+        brightness = DEFAULT_BRIGHTNESS
+
+    return rpiColor(
+        int(r * brightness),
+        int(g * brightness),
+        int(b * brightness),
+        int(w * brightness),
+    )
+
 
 # LED strip configuration:
 LED_COUNT = 100  # Number of LED pixels.
@@ -205,6 +217,7 @@ def reset_lights(strip: PixelStrip, base_colors: list[Color]):
         strip.setPixelColor(i, base_colors[i % len(base_colors)])
     strip.show()
 
+
 def off(strip: PixelStrip):
     """
     Turn off all LEDs.
@@ -213,6 +226,7 @@ def off(strip: PixelStrip):
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, Color(0, 0, 0))  # Turn off
     strip.show()
+
 
 def generate_vibrant_color():
     """
@@ -318,7 +332,12 @@ def fireworks(strip, row_lengths, num_fireworks=3, burst_delay=500, fade_time=2)
 
 
 def ripple_wave(
-    strip: PixelStrip, row_lengths: list[int], base_colors: list[Color], feeder_index=9, ripple_color=Color(255, 255, 128), speed=100
+    strip: PixelStrip,
+    row_lengths: list[int],
+    base_colors: list[Color],
+    feeder_index=9,
+    ripple_color=Color(255, 255, 128),
+    speed=100,
 ):
     """
     Create a ripple-down animation starting from the top (last row) and ending at the treat feeder.
