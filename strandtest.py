@@ -5,20 +5,21 @@
 # Direct port of the Arduino NeoPixel library strandtest example.  Showcases
 # various animations on a strip of NeoPixels.
 
-import time
-from rpi_ws281x import *
 import argparse
 import random
-# LED strip configuration:
-LED_COUNT      = 100     # Number of LED pixels.
-LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
-#LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
-LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
-LED_DMA        = 10      # DMA channel to use for generating a signal (try 10)
-LED_BRIGHTNESS = 65      # Set to 0 for darkest and 255 for brightest
-LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
-LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
+import time
 
+from rpi_ws281x import *
+
+# LED strip configuration:
+LED_COUNT = 100  # Number of LED pixels.
+LED_PIN = 18  # GPIO pin connected to the pixels (18 uses PWM!).
+# LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
+LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
+LED_DMA = 10  # DMA channel to use for generating a signal (try 10)
+LED_BRIGHTNESS = 65  # Set to 0 for darkest and 255 for brightest
+LED_INVERT = False  # True to invert the signal (when using NPN transistor level shift)
+LED_CHANNEL = 0  # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 
 # Define functions which animate LEDs in various ways.
@@ -27,18 +28,20 @@ def colorWipe(strip, color, wait_ms=50):
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, color)
         strip.show()
-        time.sleep(wait_ms/1000.0)
+        time.sleep(wait_ms / 1000.0)
+
 
 def theaterChase(strip, color, wait_ms=50, iterations=10):
     """Movie theater light style chaser animation."""
     for j in range(iterations):
         for q in range(3):
             for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i+q, color)
+                strip.setPixelColor(i + q, color)
             strip.show()
-            time.sleep(wait_ms/1000.0)
+            time.sleep(wait_ms / 1000.0)
             for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i+q, 0)
+                strip.setPixelColor(i + q, 0)
+
 
 def wheel(pos):
     """Generate rainbow colors across 0-255 positions."""
@@ -51,76 +54,81 @@ def wheel(pos):
         pos -= 170
         return Color(0, pos * 3, 255 - pos * 3)
 
+
 def rainbow(strip, wait_ms=20, iterations=1):
     """Draw rainbow that fades across all pixels at once."""
-    for j in range(256*iterations):
+    for j in range(256 * iterations):
         for i in range(strip.numPixels()):
-            strip.setPixelColor(i, wheel((i+j) & 255))
+            strip.setPixelColor(i, wheel((i + j) & 255))
         strip.show()
-        time.sleep(wait_ms/1000.0)
+        time.sleep(wait_ms / 1000.0)
+
 
 def rainbowCycle(strip, wait_ms=20, iterations=5):
     """Draw rainbow that uniformly distributes itself across all pixels."""
-    for j in range(256*iterations):
+    for j in range(256 * iterations):
         for i in range(strip.numPixels()):
             strip.setPixelColor(i, wheel((int(i * 256 / strip.numPixels()) + j) & 255))
         strip.show()
-        time.sleep(wait_ms/1000.0)
+        time.sleep(wait_ms / 1000.0)
+
 
 def theaterChaseRainbow(strip, wait_ms=50):
     """Rainbow movie theater light style chaser animation."""
     for j in range(256):
         for q in range(3):
             for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i+q, wheel((i+j) % 255))
+                strip.setPixelColor(i + q, wheel((i + j) % 255))
             strip.show()
-            time.sleep(wait_ms/1000.0)
+            time.sleep(wait_ms / 1000.0)
             for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i+q, 0)
+                strip.setPixelColor(i + q, 0)
+
 
 # HARD CODE ROW LENGTHS
 row_lengths = [20, 16, 15, 14, 16, 19]
+
 
 def rowChangeAndSparkle(strip, wait_ms=50, sparkle_time=2):
     """Light up rows top to bottom in alternating colors, then randomly sparkle with white."""
     # Define alternating colors: red and green
     colors = [Color(255, 0, 0), Color(0, 255, 0)]  # Red, Green
-    
+
     # Top to bottom lighting
     for i in reversed(range(len(row_lengths))):  # Reverse the row index order
         row_start = int(sum(row_lengths[:i]))  # Starting index of the current row
-        row_end = row_start + row_lengths[i]      # Ending index of the current row
-        
+        row_end = row_start + row_lengths[i]  # Ending index of the current row
+
         # Get the current color (alternate between red and green)
         color = colors[i % 2]
-        
-        for j in range(row_start, row_end):       # Iterate through LEDs in the current row
+
+        for j in range(row_start, row_end):  # Iterate through LEDs in the current row
             strip.setPixelColor(j, color)
             strip.show()
             time.sleep(wait_ms / 1000.0)
-    
+
     # Sparkle effect
     sparkle_end_time = time.time() + sparkle_time
     while time.time() < sparkle_end_time:
         # Choose a random LED to sparkle white
         random_led = random.randint(0, strip.numPixels() - 1)
         original_color = strip.getPixelColor(random_led)  # Save the original color
-        
+
         # Set to white temporarily
         strip.setPixelColor(random_led, Color(255, 255, 255))
         strip.show()
         time.sleep(0.1)  # Short sparkle duration
-        
+
         # Restore the original color
         strip.setPixelColor(random_led, original_color)
         strip.show()
 
-    for i,row in enumerate(row_lengths):
+    for i, row in enumerate(row_lengths):
         current_ind = int(sum(row_lengths[0:i]))
         for j in range(row):
-            strip.setPixelColor(int(j+current_ind), color)
+            strip.setPixelColor(int(j + current_ind), color)
             strip.show()
-        time.sleep(wait_ms/1000.0)
+        time.sleep(wait_ms / 1000.0)
 
 
 def explosion(strip, row_lengths, setup_delay=10, explosion_speed=1000):
@@ -132,9 +140,9 @@ def explosion(strip, row_lengths, setup_delay=10, explosion_speed=1000):
     for i in range(len(row_lengths)):  # Top-to-bottom row order
         row_start = int(sum(row_lengths[:i]))  # Start index of the current row
         row_end = row_start + int(row_lengths[i])  # End index of the current row
-        
+
         color = colors[i % 2]  # Alternate between red and green
-        for j in range(row_start, row_end):       # Light up the row quickly
+        for j in range(row_start, row_end):  # Light up the row quickly
             strip.setPixelColor(int(j), color)
         strip.show()
         time.sleep(setup_delay / 1000.0)  # Short delay between rows
@@ -155,16 +163,28 @@ def explosion(strip, row_lengths, setup_delay=10, explosion_speed=1000):
                     row_start = int(sum(row_lengths[:current_row]))
                     row_middle = row_start + (int(row_lengths[current_row]) // 2)
                     row_end = row_start + int(row_lengths[current_row])
-                    
+
                     # Horizontal propagation: Light LEDs outward from the row middle
-                    left_led = int(row_middle - radius) if row_middle - radius >= row_start else None
-                    right_led = int(row_middle + radius) if row_middle + radius < row_end else None
-                    
+                    left_led = (
+                        int(row_middle - radius)
+                        if row_middle - radius >= row_start
+                        else None
+                    )
+                    right_led = (
+                        int(row_middle + radius)
+                        if row_middle + radius < row_end
+                        else None
+                    )
+
                     if left_led is not None:
-                        strip.setPixelColor(int(left_led), Color(255, 255, 255))  # White
+                        strip.setPixelColor(
+                            int(left_led), Color(255, 255, 255)
+                        )  # White
                     if right_led is not None:
-                        strip.setPixelColor(int(right_led), Color(255, 255, 255))  # White
-            
+                        strip.setPixelColor(
+                            int(right_led), Color(255, 255, 255)
+                        )  # White
+
         # Show the changes for this radius
         strip.show()
         time.sleep(explosion_speed / 1000.0)  # Delay between radial expansions
@@ -173,6 +193,7 @@ def explosion(strip, row_lengths, setup_delay=10, explosion_speed=1000):
     for i in range(total_leds):
         strip.setPixelColor(int(i), Color(0, 0, 0))  # Turn off
     strip.show()
+
 
 def reset_lights(strip, row_lengths):
     """
@@ -201,12 +222,15 @@ def generate_vibrant_color():
 
     for i in range(3):
         if i in dominant_indices:
-            channels[i] = random.randint(128, 255)  # High intensity for dominant channels
+            channels[i] = random.randint(
+                128, 255
+            )  # High intensity for dominant channels
         else:
-            channels[i] = random.randint(0, 64)    # Low intensity for non-dominant channel
+            channels[i] = random.randint(
+                0, 64
+            )  # Low intensity for non-dominant channel
 
     return Color(channels[0], channels[1], channels[2])
-
 
 
 def fireworks(strip, row_lengths, num_fireworks=3, burst_delay=500, fade_time=2):
@@ -228,7 +252,7 @@ def fireworks(strip, row_lengths, num_fireworks=3, burst_delay=500, fade_time=2)
 
         # 2. Generate a vibrant random color across the full spectrum
         firework_color = generate_vibrant_color()
-        
+
         # Initial bright burst
         strip.setPixelColor(int(row_middle), firework_color)  # Bright colored burst
         strip.show()
@@ -246,8 +270,16 @@ def fireworks(strip, row_lengths, num_fireworks=3, burst_delay=500, fade_time=2)
                     row_middle = row_start + (int(row_lengths[current_row]) // 2)
 
                     # Expand outward from the middle
-                    left_led = int(row_middle - radius) if row_middle - radius >= row_start else None
-                    right_led = int(row_middle + radius) if row_middle + radius < row_end else None
+                    left_led = (
+                        int(row_middle - radius)
+                        if row_middle - radius >= row_start
+                        else None
+                    )
+                    right_led = (
+                        int(row_middle + radius)
+                        if row_middle + radius < row_end
+                        else None
+                    )
 
                     if left_led is not None:
                         strip.setPixelColor(int(left_led), firework_color)
@@ -261,10 +293,14 @@ def fireworks(strip, row_lengths, num_fireworks=3, burst_delay=500, fade_time=2)
         while time.time() < twinkle_time:
             random_led = int(random.randint(0, total_leds - 1))
             original_color = strip.getPixelColor(int(random_led))
-            strip.setPixelColor(int(random_led), Color(255, 255, 255))  # Twinkle to white
+            strip.setPixelColor(
+                int(random_led), Color(255, 255, 255)
+            )  # Twinkle to white
             strip.show()
             time.sleep(0.05)
-            strip.setPixelColor(int(random_led), original_color)  # Restore original color
+            strip.setPixelColor(
+                int(random_led), original_color
+            )  # Restore original color
             strip.show()
 
         # Clear the strip for the next firework
@@ -274,8 +310,9 @@ def fireworks(strip, row_lengths, num_fireworks=3, burst_delay=500, fade_time=2)
         time.sleep(burst_delay / 1000.0)  # Delay before the next firework
 
 
-
-def ripple_wave(strip, row_lengths, feeder_index=9, ripple_color=Color(255, 255, 128), speed=100):
+def ripple_wave(
+    strip, row_lengths, feeder_index=9, ripple_color=Color(255, 255, 128), speed=100
+):
     """
     Create a ripple-down animation starting from the top (last row) and ending at the treat feeder.
     :param strip: The LED strip object.
@@ -293,7 +330,9 @@ def ripple_wave(strip, row_lengths, feeder_index=9, ripple_color=Color(255, 255,
     strip.show()
 
     # Step 2: Create the ripple-down wave (from top to bottom)
-    for i in range(len(row_lengths) - 1, -1, -1):  # Iterate from last row (top) to first row (bottom)
+    for i in range(
+        len(row_lengths) - 1, -1, -1
+    ):  # Iterate from last row (top) to first row (bottom)
         row_start = int(sum(row_lengths[:i]))  # Start index of the current row
         row_end = row_start + row_lengths[i]  # End index of the current row
 
@@ -310,9 +349,13 @@ def ripple_wave(strip, row_lengths, feeder_index=9, ripple_color=Color(255, 255,
 
     # Step 3: Conclude the ripple at the feeder
     for i in range(feeder_index + 1):  # Ripple specifically to the feeder index
-        strip.setPixelColor(i, ripple_color)  # Keep the ripple color at the feeder index
+        strip.setPixelColor(
+            i, ripple_color
+        )  # Keep the ripple color at the feeder index
         if i > 0:
-            strip.setPixelColor(i - 1, base_colors[(i - 1) % len(base_colors)])  # Restore previous
+            strip.setPixelColor(
+                i - 1, base_colors[(i - 1) % len(base_colors)]
+            )  # Restore previous
         strip.show()
         time.sleep(speed / 1000.0)
 
@@ -324,16 +367,18 @@ def ripple_wave(strip, row_lengths, feeder_index=9, ripple_color=Color(255, 255,
         strip.setPixelColor(feeder_index, ripple_color)  # Restore ripple color
         strip.show()
         time.sleep(0.1)
+
+
 def drawHeart(strip, heart_color=Color(255, 105, 180), wait_ms=50):
     """
     Lights up the LEDs in a heart shape pattern using a soft pink color.
     Assumes a rough center alignment of rows.
-    
+
     :param strip: LED strip object
     :param heart_color: Color object for the heart (default: pink)
     :param wait_ms: Delay for smooth animation (milliseconds)
     """
-    
+
     # Proper heart pattern (0 = off, 1 = lit)
     heart_matrix = [
         "00110011001100000000",  # Row 1 (20 LEDs)
@@ -343,17 +388,17 @@ def drawHeart(strip, heart_color=Color(255, 105, 180), wait_ms=50):
         "00011111111000000000",  # Row 5 (16 LEDs)
         "00001111110000000000",  # Row 6 (19 LEDs)
     ]
-    
+
     # Convert heart matrix to LED positions
     for row_idx, row_pattern in enumerate(heart_matrix):
         row_start = int(sum(row_lengths[:row_idx]))  # Start index of the row
         row_leds = row_lengths[row_idx]  # Number of LEDs in this row
-        
+
         # Trim to match actual row length
         row_pattern = row_pattern[:row_leds]
-        
+
         for char_idx, char in enumerate(row_pattern):
-            if char == '1':  # Light up only heart shape positions
+            if char == "1":  # Light up only heart shape positions
                 strip.setPixelColor(row_start + char_idx, heart_color)
                 strip.show()
                 time.sleep(wait_ms / 1000.0)  # Smooth animation delay
@@ -365,20 +410,20 @@ def drawHeart(strip, heart_color=Color(255, 105, 180), wait_ms=50):
     for brightness in range(255, 0, -15):
         dim_color = Color(
             (heart_color >> 16 & 0xFF) * brightness // 255,  # Red channel
-            (heart_color >> 8 & 0xFF) * brightness // 255,   # Green channel
-            (heart_color & 0xFF) * brightness // 255         # Blue channel
+            (heart_color >> 8 & 0xFF) * brightness // 255,  # Green channel
+            (heart_color & 0xFF) * brightness // 255,  # Blue channel
         )
-        
+
         for row_idx, row_pattern in enumerate(heart_matrix):
             row_start = int(sum(row_lengths[:row_idx]))
             row_leds = row_lengths[row_idx]
-            
+
             row_pattern = row_pattern[:row_leds]
-            
+
             for char_idx, char in enumerate(row_pattern):
-                if char == '1':
+                if char == "1":
                     strip.setPixelColor(row_start + char_idx, dim_color)
-        
+
         strip.show()
         time.sleep(0.1)  # Smooth dimming
 
@@ -388,7 +433,7 @@ def drawHeart(strip, heart_color=Color(255, 105, 180), wait_ms=50):
     strip.show()
 
 
-'''
+"""
 # Main program logic follows:
 if __name__ == '__main__':
     # Process arguments
@@ -433,4 +478,4 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         if args.clear:
             colorWipe(strip, Color(0,0,0), 10)
-'''
+"""
