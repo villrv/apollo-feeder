@@ -88,10 +88,9 @@ def theaterChaseRainbow(strip, wait_ms=50):
 row_lengths = [20, 16, 15, 14, 16, 19]
 
 
-def rowChangeAndSparkle(strip, wait_ms=50, sparkle_time=2):
+def rowChangeAndSparkle(strip, colors, wait_ms=50, sparkle_time=2):
     """Light up rows top to bottom in alternating colors, then randomly sparkle with white."""
     # Define alternating colors: red and green
-    colors = [Color(255, 0, 0), Color(0, 255, 0)]  # Red, Green
 
     # Top to bottom lighting
     for i in reversed(range(len(row_lengths))):  # Reverse the row index order
@@ -130,10 +129,8 @@ def rowChangeAndSparkle(strip, wait_ms=50, sparkle_time=2):
         time.sleep(wait_ms / 1000.0)
 
 
-def explosion(strip, row_lengths, setup_delay=10, explosion_speed=1000):
+def explosion(strip, row_lengths, colors, setup_delay=10, explosion_speed=1000):
     """Light rows in red/green quickly, then explode white radially both horizontally and vertically."""
-    # Define alternating colors: red and green
-    colors = [Color(255, 0, 0), Color(0, 255, 0)]  # Red, Green
 
     # 1. Light rows in alternating red and green (quickly)
     for i in range(len(row_lengths)):  # Top-to-bottom row order
@@ -194,14 +191,13 @@ def explosion(strip, row_lengths, setup_delay=10, explosion_speed=1000):
     strip.show()
 
 
-def reset_lights(strip: PixelStrip, row_lengths):
+def reset_lights(strip: PixelStrip, base_colors: list[Color]):
     """
     Reset the LEDs to alternating red/green rows.
     :param strip: The LED strip object.
     :param row_lengths: Array of row lengths.
     """
-    base_colors = [Color(255, 0, 0), Color(0, 255, 0)]  # Red and Green
-    for i in range(sum(row_lengths)):
+    for i in range(strip.numPixels()):
         strip.setPixelColor(i, base_colors[i % len(base_colors)])
     strip.show()
 
@@ -318,7 +314,7 @@ def fireworks(strip, row_lengths, num_fireworks=3, burst_delay=500, fade_time=2)
 
 
 def ripple_wave(
-    strip, row_lengths, feeder_index=9, ripple_color=Color(255, 255, 128), speed=100
+    strip: PixelStrip, row_lengths: list[int], base_colors: list[Color], feeder_index=9, ripple_color=Color(255, 255, 128), speed=100
 ):
     """
     Create a ripple-down animation starting from the top (last row) and ending at the treat feeder.
@@ -331,7 +327,6 @@ def ripple_wave(
     total_leds = sum(row_lengths)
 
     # Step 1: Initialize all LEDs in alternating red and green
-    base_colors = [Color(255, 0, 0), Color(0, 255, 0)]  # Red and Green
     for i in range(total_leds):
         strip.setPixelColor(i, base_colors[i % len(base_colors)])
     strip.show()

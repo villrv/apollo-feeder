@@ -14,6 +14,10 @@ from rpi_ws281x import Color, PixelStrip  # For LEDs
 import strand
 
 DEFAULT_TREATS = 5
+BASE_COLORS = [
+    Color(255, 0, 255),  # pink
+    Color(255, 255, 255),  # white
+]
 
 app = Flask(__name__)
 
@@ -141,12 +145,13 @@ def give_treat():
 
             # Pick a random animation and run it
             animations = [
-                # lambda: rowChangeAndSparkle(strip, wait_ms=50, sparkle_time=5),
-                # lambda: explosion(strip, row_lengths, setup_delay=10, explosion_speed=150),
+                # lambda: rowChangeAndSparkle(strip, BASE_COLORS, wait_ms=50, sparkle_time=5),
+                # lambda: explosion(strip, row_lengths, BASE_COLORS, setup_delay=10, explosion_speed=150),
                 # lambda: fireworks(strip, row_lengths, num_fireworks=5, burst_delay=500, fade_time=3),
                 lambda: strand.ripple_wave(
                     strip,
                     strand.row_lengths,
+                    BASE_COLORS,
                     feeder_index=9,
                     ripple_color=Color(255, 255, 128),
                     speed=150,
@@ -155,7 +160,7 @@ def give_treat():
             random.choice(animations)()  # Pick and run one animation randomly
 
             # Reset the lights to red/green rows after the animation
-            # strand.reset_lights(strip, row_lengths)
+            # strand.reset_lights(strip, BASE_COLORS)
 
             # Turn lights off
             strand.off(strip)
