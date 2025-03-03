@@ -24,15 +24,13 @@ BASE_COLORS = [
 ]
 DEFAULT_BRIGHTNESS = 0.1
 ENABLE_LIGHTS = False
+ENABLE_SERVO = False
 
 #####
 
 strand.DEFAULT_BRIGHTNESS = DEFAULT_BRIGHTNESS
 
 app = Flask(__name__)
-
-# **Debugging:** Replace servo call with an easy toggle
-enable_servo = False  # Toggle to enable/disable servo
 
 # Variable to track the number of treats left
 treats_left = DEFAULT_TREATS
@@ -147,7 +145,7 @@ def give_treat():
         # Start the treat dispensing and LED animation in a separate thread
         def treat_and_lights():
             # Servo dispensing logic
-            if enable_servo:
+            if ENABLE_SERVO:
                 set_servo_angle(36 + 18)  # Rotate the servo
                 time.sleep(1)
                 set_servo_angle(18)
