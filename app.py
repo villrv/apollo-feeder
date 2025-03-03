@@ -23,10 +23,11 @@ BASE_COLORS = [
     Color(255, 255, 255),  # white
 ]
 DEFAULT_BRIGHTNESS = 0.1
+ENABLE_LIGHTS = False
 
 #####
 
-strand.DEFAULT_BRIGHTNESS = 0.1
+strand.DEFAULT_BRIGHTNESS = DEFAULT_BRIGHTNESS
 
 app = Flask(__name__)
 
@@ -166,13 +167,14 @@ def give_treat():
                     speed=150,
                 )
             ]
-            random.choice(animations)()  # Pick and run one animation randomly
+            if ENABLE_LIGHTS:
+                random.choice(animations)()  # Pick and run one animation randomly
+                strand.off(strip)
 
             # Reset the lights to red/green rows after the animation
             # strand.reset_lights(strip, BASE_COLORS)
 
             # Turn lights off
-            strand.off(strip)
 
         # Run treat dispensing and lights asynchronously
         threading.Thread(target=treat_and_lights).start()
@@ -192,7 +194,8 @@ def thank_you():
 
 
 def startup():
-    strand.off(strip)
+    if ENABLE_LIGHTS:
+        strand.off(strip)
     reset_ip_tracking()
 
 
