@@ -65,6 +65,35 @@
             background-color: #CC9900;
         }
 
+        /* FLOWERY BUTTON */
+        .flower-button {
+            position: relative;
+            width: 160px;
+            height: 50px;
+            background: linear-gradient(135deg, #ffe4ec, #ffd6e0);
+            border-radius: 25px;
+            border: 2px solid #f4a3c2;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #914e68;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.3s ease;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .flower-button:hover {
+            background: linear-gradient(135deg, #fff0f5, #ffc9da);
+            transform: scale(1.03);
+        }
+
+        .flower-button:active {
+            transform: scale(0.97) translateY(2px);
+            background: linear-gradient(135deg, #f4b1c8, #e996b5);
+        }
+
+
         /* Custom Pop-Up Styling */
         #popup {
             display: none;
@@ -323,16 +352,12 @@
     <h1>Apollo's Feeder</h1>
     <p>Remaining Treats: <span id="treat-count">{{ treats }}</span></p>
 
-    <button id="feed-button" class="spring-button">Give Treat</button>
+    <button id="feed-button" class="flower-button">Give Treat</button>
 
     <div id="popup">
         <p id="popup-message"></p>
         <button id="close-popup">Close</button>
     </div>
-    <!-- Special text -->
-<p class="birthday-text">
-    <span class="highlighted">Apollo turned 10 this month!!!</span> Help him celebrate his birthday with some treats!
-</p>
 
 
 
