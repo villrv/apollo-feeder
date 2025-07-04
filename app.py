@@ -114,7 +114,7 @@ scheduler.start()
 
 @app.route("/")
 def home():
-    bones = "🌸 " * treats_left  # Display the remaining treats as emojis
+    bones = "✏️ " * treats_left  # Display the remaining treats as emojis
     return render_template("index.html", treats=bones.strip())
 
 
@@ -178,7 +178,7 @@ def give_treat():
         threading.Thread(target=treat_and_lights).start()
 
         # Immediately respond with a success message
-        bones = "🌸 " * treats_left  # Display the remaining treats as emojis
+        bones = "✏️ " * treats_left  # Display the remaining treats as emojis
         return jsonify({"treats_left": bones.strip(), "message": message})
 
     else:
