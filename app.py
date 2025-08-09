@@ -4,6 +4,7 @@ import random
 import threading
 import time
 import csv
+import logging
 from datetime import datetime
 
 import RPi.GPIO as GPIO
@@ -32,6 +33,10 @@ ENABLE_SERVO = False
 strand.DEFAULT_BRIGHTNESS = DEFAULT_BRIGHTNESS
 
 app = Flask(__name__)
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 # Variable to track the number of treats left
 treats_left = DEFAULT_TREATS
@@ -76,40 +81,39 @@ def load_fan_art_metadata():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     csv_path = os.path.join(script_dir, "static", "apollo-fan-art", "meta_data.csv")
     
-    print(f"Script directory: {script_dir}")
-    print(f"Looking for CSV at: {csv_path}")
-    print(f"File exists: {os.path.exists(csv_path)}")
+    logger.info(f"Script directory: {script_dir}")
+    logger.info(f"Looking for CSV at: {csv_path}")
+    logger.info(f"File exists: {os.path.exists(csv_path)}")
     
     try:
         if os.path.exists(csv_path):
-            print(f"CSV file found! Reading contents...")
+            logger.info(f"CSV file found! Reading contents...")
             with open(csv_path, 'r', encoding='utf-8') as file:
                 content = file.read()
-                print(f"CSV file content:\n{content}")
+                logger.info(f"CSV file content:\n{content}")
                 file.seek(0)  # Reset file pointer to beginning
                 reader = csv.DictReader(file)
                 for row in reader:
-                    print(f"Processing row: {row}")
+                    logger.info(f"Processing row: {row}")
                     # Clean up the data (remove quotes and extra spaces)
                     art_piece = {
                         'filename': row['filename'].strip(),
-                        'artist': row['artist'].strip(),
                         'title': row['title'].strip().strip('"')
                     }
                     fan_art.append(art_piece)
-                    print(f"Loaded art piece: {art_piece}")
+                    logger.info(f"Loaded art piece: {art_piece}")
             
             # Return a random piece of art instead of all pieces
             if fan_art:
                 selected = random.choice(fan_art)
-                print(f"Selected random piece: {selected}")
+                logger.info(f"Selected random piece: {selected}")
                 return [selected]
             else:
-                print("No fan art pieces found in CSV")
+                logger.info("No fan art pieces found in CSV")
         else:
-            print(f"CSV file not found at {csv_path}")
+            logger.info(f"CSV file not found at {csv_path}")
     except Exception as e:
-        print(f"Error loading fan art metadata: {e}")
+        logger.error(f"Error loading fan art metadata: {e}")
     
     return []
 
@@ -161,10 +165,10 @@ scheduler.start()
 
 @app.route("/")
 def home():
-    print("=== HOME ROUTE CALLED ===")
+    logger.info("=== HOME ROUTE CALLED ===")
     bones = "🍦 " * treats_left  # Display the remaining treats as ice cream emojis
     fan_art_metadata = load_fan_art_metadata()
-    print(f"Fan art metadata returned: {fan_art_metadata}")
+    logger.info(f"Fan art metadata returned: {fan_art_metadata}")
     return render_template("index.html", treats=bones.strip(), fan_art=fan_art_metadata)
 
 
