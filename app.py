@@ -3,6 +3,7 @@ import os
 import random
 import threading
 import time
+import csv
 from datetime import datetime
 
 import RPi.GPIO as GPIO
@@ -67,6 +68,32 @@ def get_current_date():
     return datetime.now().strftime("%Y-%m-%d")
 
 
+def load_fan_art_metadata():
+    """Loads fan art metadata from the CSV file and returns a random piece."""
+    fan_art = []
+    csv_path = os.path.join("static", "apollo-fan-art", "meta_data.csv")
+    
+    try:
+        if os.path.exists(csv_path):
+            with open(csv_path, 'r', encoding='utf-8') as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    # Clean up the data (remove quotes and extra spaces)
+                    fan_art.append({
+                        'filename': row['filename'].strip(),
+                        'artist': row['artist'].strip(),
+                        'title': row['title'].strip().strip('"')
+                    })
+            
+            # Return a random piece of art instead of all pieces
+            if fan_art:
+                return [random.choice(fan_art)]
+    except Exception as e:
+        print(f"Error loading fan art metadata: {e}")
+    
+    return []
+
+
 def load_ip_addresses():
     """Loads the list of IP addresses that have fed Apollo today."""
     if os.path.exists(IP_TRACKING_FILE):
@@ -115,7 +142,8 @@ scheduler.start()
 @app.route("/")
 def home():
     bones = "✏️ " * treats_left  # Display the remaining treats as emojis
-    return render_template("index.html", treats=bones.strip())
+    fan_art_metadata = load_fan_art_metadata()
+    return render_template("index.html", treats=bones.strip(), fan_art=fan_art_metadata)
 
 
 @app.route("/give_treat", methods=["POST"])

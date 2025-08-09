@@ -316,13 +316,13 @@
         position: relative;
         width: 160px;
         height: 50px;
-        background: linear-gradient(135deg, #e0d4f4, #f3e7ff); /* soft lavender gradient */
+        background: linear-gradient(135deg, #87ceeb, #4682b4); /* sky blue gradient */
         border-radius: 25px;
-        border: 2px solid #b999f7;
+        border: 2px solid #4169e1;
         font-size: 16px;
         font-weight: bold;
         text-transform: uppercase;
-        color: #5b3b8c; /* deep purple */
+        color: #ffffff; /* white text for contrast */
         letter-spacing: 1px;
         cursor: pointer;
         transition: transform 0.2s ease, background 0.3s ease;
@@ -331,25 +331,25 @@
     }
 
     .artist-button:hover {
-        background: linear-gradient(135deg, #f5e9ff, #e4d3fa);
+        background: linear-gradient(135deg, #7bb8e8, #3a7bb8);
         transform: scale(1.03);
     }
 
     .artist-button:active {
         transform: scale(0.97) translateY(2px);
-        background: linear-gradient(135deg, #d4c2f0, #ccb3f5);
+        background: linear-gradient(135deg, #5f9ea0, #2f4f4f);
     }
 
-    /* Floating sparkles for flair */
+    /* Floating suns for sky theme */
     .artist-button::before,
     .artist-button::after {
-        content: "✨";
+        content: "☀️";
         position: absolute;
         top: 50%;
         font-size: 14px;
-        color: rgba(160, 120, 255, 0.6);
+        color: rgba(255, 255, 255, 0.8);
         opacity: 0;
-        animation: floatSparkle 2s ease-in-out infinite;
+        animation: floatSun 2s ease-in-out infinite;
     }
 
     .artist-button::before {
@@ -362,7 +362,7 @@
         animation-delay: 0.5s;
     }
 
-    @keyframes floatSparkle {
+    @keyframes floatSun {
         0% {
             transform: translateY(0) scale(1);
             opacity: 0;
@@ -418,12 +418,19 @@
 <body>
     <h1>Apollo's Feeder</h1>
     <p>
-        Remaining Treats: <span id="treat-count">{{ treats }}</span><br>
-        🎨 We're hosting an <strong>Apollo Art Showcase</strong>!<br>
-        Submit your masterpiece by <strong>August 1</strong>: 
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfDo9Ngmc1AXJ911c3-hoW5ozNJdYm5SWyE1O7KtS1A1UNiag/viewform?usp=header" target="_blank">Submit Here</a> 🐾
+        Remaining Treats: <span id="treat-count">{{ treats }}</span>
     </p>
 
+    <!-- Fan Art Call-to-Action -->
+    <div style="background: linear-gradient(135deg, #e3f2fd, #bbdefb); border: 2px solid #2196f3; border-radius: 15px; padding: 20px; margin: 20px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <h3 style="color: #1565c0; margin-top: 0;">Want to show off Apollo Art?</h3>
+        <p style="color: #1565c0; font-size: 16px; margin-bottom: 15px;">
+            We're accepting art all through August! 
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfDo9Ngmc1AXJ911c3-hoW5ozNJdYm5SWyE1O7KtS1A1UNiag/viewform?usp=sharing&ouid=104858452339532607895" target="_blank" style="color: #d63384; font-weight: bold;">Click here to submit your art</a> 
+            or 
+            <a href="https://drive.google.com/file/d/1afYQKjzSMbVw2IiL3rrXac72ZDHAPqCH/view" target="_blank" style="color: #d63384; font-weight: bold;">download a printable Apollo coloring page</a>!
+        </p>
+    </div>
 
     <button id="feed-button" class="artist-button">Give Treat</button>
 
@@ -432,7 +439,26 @@
         <button id="close-popup">Close</button>
     </div>
 
-
+    <!-- Featured Fan Art -->
+    <div style="margin: 40px 0; padding: 20px; background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <h2 style="color: #495057; margin-bottom: 25px;">Featured Art</h2>
+        
+        {% if fan_art %}
+            <div style="text-align: center;">
+                {% for art in fan_art %}
+                <div style="display: inline-block; max-width: 400px;">
+                    <img src="{{ url_for('static', filename='apollo-fan-art/' + art.filename) }}" 
+                         alt="{{ art.title }} by {{ art.artist }}" 
+                         style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); margin-bottom: 15px;">
+                    <h4 style="color: #495057; margin: 5px 0; font-size: 20px;">{{ art.title }}</h4>
+                    <p style="color: #6c757d; font-style: italic; margin: 0; font-size: 16px;">by {{ art.artist }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="color: #6c757d; font-style: italic;">No fan art submitted yet. Be the first!</p>
+        {% endif %}
+    </div>
 
     <!-- Google Form Link -->
     <p>
@@ -440,7 +466,7 @@
     </p>
 
     <!-- Apollo Image -->
-    <img src="/static/apollo-art.png" alt="Apollo" class="apollo-image">
+    <!-- <img src="/static/apollo-art.png" alt="Apollo" class="apollo-image"> -->
 
     <script>
         document.getElementById('feed-button').addEventListener('click', function () {
