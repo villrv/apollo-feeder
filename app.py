@@ -71,7 +71,14 @@ def get_current_date():
 def load_fan_art_metadata():
     """Loads fan art metadata from the CSV file and returns a random piece."""
     fan_art = []
-    csv_path = os.path.join("static", "apollo-fan-art", "meta_data.csv")
+    
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(script_dir, "static", "apollo-fan-art", "meta_data.csv")
+    
+    print(f"Script directory: {script_dir}")
+    print(f"Looking for CSV at: {csv_path}")
+    print(f"File exists: {os.path.exists(csv_path)}")
     
     try:
         if os.path.exists(csv_path):
@@ -79,15 +86,23 @@ def load_fan_art_metadata():
                 reader = csv.DictReader(file)
                 for row in reader:
                     # Clean up the data (remove quotes and extra spaces)
-                    fan_art.append({
+                    art_piece = {
                         'filename': row['filename'].strip(),
                         'artist': row['artist'].strip(),
                         'title': row['title'].strip().strip('"')
-                    })
+                    }
+                    fan_art.append(art_piece)
+                    print(f"Loaded art piece: {art_piece}")
             
             # Return a random piece of art instead of all pieces
             if fan_art:
-                return [random.choice(fan_art)]
+                selected = random.choice(fan_art)
+                print(f"Selected random piece: {selected}")
+                return [selected]
+            else:
+                print("No fan art pieces found in CSV")
+        else:
+            print(f"CSV file not found at {csv_path}")
     except Exception as e:
         print(f"Error loading fan art metadata: {e}")
     
@@ -141,7 +156,7 @@ scheduler.start()
 
 @app.route("/")
 def home():
-    bones = "✏️ " * treats_left  # Display the remaining treats as emojis
+    bones = "🍦 " * treats_left  # Display the remaining treats as ice cream emojis
     fan_art_metadata = load_fan_art_metadata()
     return render_template("index.html", treats=bones.strip(), fan_art=fan_art_metadata)
 
@@ -206,7 +221,7 @@ def give_treat():
         threading.Thread(target=treat_and_lights).start()
 
         # Immediately respond with a success message
-        bones = "✏️ " * treats_left  # Display the remaining treats as emojis
+        bones = "🍦 " * treats_left  # Display the remaining treats as emojis
         return jsonify({"treats_left": bones.strip(), "message": message})
 
     else:
