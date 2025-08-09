@@ -82,9 +82,14 @@ def load_fan_art_metadata():
     
     try:
         if os.path.exists(csv_path):
+            print(f"CSV file found! Reading contents...")
             with open(csv_path, 'r', encoding='utf-8') as file:
+                content = file.read()
+                print(f"CSV file content:\n{content}")
+                file.seek(0)  # Reset file pointer to beginning
                 reader = csv.DictReader(file)
                 for row in reader:
+                    print(f"Processing row: {row}")
                     # Clean up the data (remove quotes and extra spaces)
                     art_piece = {
                         'filename': row['filename'].strip(),
@@ -156,8 +161,10 @@ scheduler.start()
 
 @app.route("/")
 def home():
+    print("=== HOME ROUTE CALLED ===")
     bones = "🍦 " * treats_left  # Display the remaining treats as ice cream emojis
     fan_art_metadata = load_fan_art_metadata()
+    print(f"Fan art metadata returned: {fan_art_metadata}")
     return render_template("index.html", treats=bones.strip(), fan_art=fan_art_metadata)
 
 
