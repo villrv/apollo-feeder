@@ -89,12 +89,8 @@ def load_fan_art_metadata():
         if os.path.exists(csv_path):
             logger.info(f"CSV file found! Reading contents...")
             with open(csv_path, 'r', encoding='utf-8') as file:
-                content = file.read()
-                logger.info(f"CSV file content:\n{content}")
-                file.seek(0)  # Reset file pointer to beginning
                 reader = csv.DictReader(file)
                 for row in reader:
-                    logger.info(f"Processing row: {row}")
                     # Clean up the data (remove quotes and extra spaces)
                     art_piece = {
                         'filename': row['filename'].strip(),
