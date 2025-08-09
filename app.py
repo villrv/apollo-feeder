@@ -98,7 +98,8 @@ def load_fan_art_metadata():
                     # Clean up the data (remove quotes and extra spaces)
                     art_piece = {
                         'filename': row['filename'].strip(),
-                        'title': row['title'].strip().strip('"')
+                        'artist': row[' artist'].strip(),  # Note the leading space
+                        'title': row[' title'].strip().strip('"')  # Note the leading space
                     }
                     fan_art.append(art_piece)
                     logger.info(f"Loaded art piece: {art_piece}")
