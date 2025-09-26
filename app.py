@@ -46,10 +46,10 @@ IP_TRACKING_FILE = "fed_ip_addresses.txt"
 
 # Set up GPIO
 GPIO.setmode(GPIO.BCM)  # Use Broadcom pin numbering
-GPIO.setup(17, GPIO.OUT)  # Set GPIO pin 17 as output
+GPIO.setup(26, GPIO.OUT)  # Set GPIO pin 26 as output
 
 # Set up PWM on the GPIO pin for the servo
-servo = GPIO.PWM(17, 50)  # GPIO 17 for PWM with 50Hz frequency
+servo = GPIO.PWM(26, 50)  # GPIO 26 for PWM with 50Hz frequency
 servo.start(0)  # Initialize PWM with 0% duty cycle
 
 # LED strip configuration:
