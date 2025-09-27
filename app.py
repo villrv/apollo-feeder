@@ -146,9 +146,9 @@ def led_test():
     # Turn all LEDs on with a nice Halloween orange color
     # NOTE: This LED strip uses GRB channel order (not RGB)
     # So Color(R, G, B) actually displays as (G, R, B)
-    # For orange: Color(150, 200, 0) = Green=150, Red=200, Blue=0
+    # For orange: Color(100, 255, 0) = Green=100, Red=255, Blue=0
     for i in range(strip.numPixels()):
-        strip.setPixelColor(i, Color(150, 200, 0))  # More red, less green
+        strip.setPixelColor(i, Color(100, 255, 0))  # Much more red, less green
     strip.show()
     
     # Wait for 3 seconds
