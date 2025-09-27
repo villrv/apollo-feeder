@@ -11,26 +11,24 @@ import RPi.GPIO as GPIO
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from flask import Flask, jsonify, render_template, request
-from rpi_ws281x import PixelStrip  # For LEDs
-
-import strand
-
-from strand import Color
+from rpi_ws281x import PixelStrip, Color
 
 #####
 
 DEFAULT_TREATS = 5
-BASE_COLORS = [
-    Color(255, 0, 255),  # pink
-    Color(255, 255, 255),  # white
-]
-DEFAULT_BRIGHTNESS = 0.1
-ENABLE_LIGHTS = False
 ENABLE_SERVO = False
+ENABLE_LIGHTS = True
+
+# LED strip configuration for Pi 3
+LED_COUNT = 100  # Number of LED pixels
+LED_PIN = 18  # GPIO pin connected to the pixels (18 uses PWM!)
+LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800kHz)
+LED_DMA = 10  # DMA channel to use for generating signal
+LED_BRIGHTNESS = 65  # Set to 0 for darkest and 255 for brightest
+LED_INVERT = False  # True to invert the signal
+LED_CHANNEL = 0  # Use channel 0
 
 #####
-
-strand.DEFAULT_BRIGHTNESS = DEFAULT_BRIGHTNESS
 
 app = Flask(__name__)
 
@@ -46,26 +44,18 @@ IP_TRACKING_FILE = "fed_ip_addresses.txt"
 
 # Set up GPIO
 GPIO.setmode(GPIO.BCM)  # Use Broadcom pin numbering
-GPIO.setup(26, GPIO.OUT)  # Set GPIO pin 26 as output
+GPIO.setup(7, GPIO.OUT)  # Set GPIO pin 7 as output
 
 # Set up PWM on the GPIO pin for the servo
-servo = GPIO.PWM(26, 50)  # GPIO 26 for PWM with 50Hz frequency
+servo = GPIO.PWM(7, 50)  # GPIO 7 for PWM with 50Hz frequency
 servo.start(0)  # Initialize PWM with 0% duty cycle
 
-# LED strip configuration:
-LED_COUNT = 100  # Number of LED pixels.
-LED_PIN = 18  # GPIO pin connected to the pixels (18 uses PWM!).
-LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800kHz)
-LED_DMA = 10  # DMA channel to use for generating a signal (try 10)
-LED_BRIGHTNESS = 65  # Set to 0 for darkest and 255 for brightest
-LED_INVERT = False  # True to invert the signal
-LED_CHANNEL = 0  # Use channel 0
-
-# Initialize the NeoPixel strip
+# Initialize the LED strip
 strip = PixelStrip(
     LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL
 )
 strip.begin()
+
 
 
 def get_current_date():
@@ -146,6 +136,28 @@ def set_servo_angle(angle):
     servo.ChangeDutyCycle(0)  # Stop the PWM signal
 
 
+def led_test():
+    """Simple LED test: turn all lights on for 3 seconds, then off."""
+    if not ENABLE_LIGHTS:
+        return
+        
+    logger.info("Starting LED test - turning lights on")
+    
+    # Turn all LEDs on with a nice color (bright white)
+    for i in range(strip.numPixels()):
+        strip.setPixelColor(i, Color(255, 255, 255))  # White
+    strip.show()
+    
+    # Wait for 3 seconds
+    time.sleep(3)
+    
+    # Turn all LEDs off
+    logger.info("LED test complete - turning lights off")
+    for i in range(strip.numPixels()):
+        strip.setPixelColor(i, Color(0, 0, 0))  # Off
+    strip.show()
+
+
 def reset_treats():
     """Resets the treat count and IP tracking daily at 3 AM ET."""
     global treats_left
@@ -193,8 +205,11 @@ def give_treat():
         message = "Apollo got a treat!"
         save_ip_address(user_ip)
 
-        # Start the treat dispensing and LED animation in a separate thread
-        def treat_and_lights():
+        # Start the treat dispensing and LED test in a separate thread
+        def treat_dispensing():
+            # LED test - turn lights on for 3 seconds
+            led_test()
+            
             # Servo dispensing logic
             if ENABLE_SERVO:
                 set_servo_angle(36 + 18)  # Rotate the servo
@@ -202,31 +217,8 @@ def give_treat():
                 set_servo_angle(18)
                 time.sleep(1)
 
-            # Pick a random animation and run it
-            animations = [
-                # lambda: rowChangeAndSparkle(strip, BASE_COLORS, wait_ms=50, sparkle_time=5),
-                # lambda: explosion(strip, row_lengths, BASE_COLORS, setup_delay=10, explosion_speed=150),
-                # lambda: fireworks(strip, row_lengths, num_fireworks=5, burst_delay=500, fade_time=3),
-                lambda: strand.ripple_wave(
-                    strip,
-                    strand.row_lengths,
-                    BASE_COLORS,
-                    feeder_index=9,
-                    ripple_color=Color(255, 255, 128),
-                    speed=150,
-                )
-            ]
-            if ENABLE_LIGHTS:
-                random.choice(animations)()  # Pick and run one animation randomly
-                strand.off(strip)
-
-            # Reset the lights to red/green rows after the animation
-            # strand.reset_lights(strip, BASE_COLORS)
-
-            # Turn lights off
-
-        # Run treat dispensing and lights asynchronously
-        threading.Thread(target=treat_and_lights).start()
+        # Run treat dispensing asynchronously
+        threading.Thread(target=treat_dispensing).start()
 
         # Immediately respond with a success message
         bones = "🍦 " * treats_left  # Display the remaining treats as emojis
@@ -243,8 +235,11 @@ def thank_you():
 
 
 def startup():
+    # Turn off all LEDs on startup
     if ENABLE_LIGHTS:
-        strand.off(strip)
+        for i in range(strip.numPixels()):
+            strip.setPixelColor(i, Color(0, 0, 0))  # Off
+        strip.show()
     reset_ip_tracking()
 
 
