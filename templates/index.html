@@ -3,21 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apollo's Feeder</title>
+    <title>Apollo's Spooky Feeder 🎃</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Creepster', cursive, Arial, sans-serif;
             text-align: center;
             padding: 50px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #fff;
+            min-height: 100vh;
+            margin: 0;
         }
 
         h1 {
-            color: #333;
+            color: #ff6b35;
+            text-shadow: 3px 3px 6px #000;
+            font-size: 3em;
+            margin-bottom: 20px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 3px 3px 6px #000, 0 0 20px #ff6b35; }
+            to { text-shadow: 3px 3px 6px #000, 0 0 30px #ff6b35, 0 0 40px #ff6b35; }
         }
 
         #treat-count {
-            font-size: 24px;  
-            color: #555;
+            font-size: 28px;  
+            color: #ff6b35;
+            text-shadow: 2px 2px 4px #000;
+            font-weight: bold;
         }
 
         .bone-button {
@@ -94,44 +109,54 @@
         }
 
 
-        /* Custom Pop-Up Styling */
+        /* Spooky Pop-Up Styling */
         #popup {
             display: none;
             position: fixed;
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            background-color: #FFF;
-            padding: 20px;
-            border: 2px solid #FFCC66;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #2c1810, #1a0f0a);
+            padding: 25px;
+            border: 3px solid #ff6b35;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.1);
             z-index: 100;
+            color: #fff;
+            text-shadow: 1px 1px 2px #000;
         }
 
         #popup button {
-            background-color: #FFCC66;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            color: #FFF;
+            background: linear-gradient(135deg, #ff6b35, #d2691e);
+            border: 2px solid #ff4500;
+            border-radius: 8px;
+            padding: 12px 24px;
+            color: #fff;
             cursor: pointer;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px #000;
+            transition: all 0.3s ease;
         }
 
         #popup button:hover {
-            background-color: #FFA500;
+            background: linear-gradient(135deg, #ff7f50, #ff6347);
+            transform: scale(1.05);
         }
 
-        /* Link Styling */
+        /* Spooky Link Styling */
         .feedback-link {
             margin-top: 20px;
             font-size: 16px;
-            color: #007BFF;
+            color: #ff6b35;
             text-decoration: none;
+            text-shadow: 1px 1px 2px #000;
+            transition: all 0.3s ease;
         }
 
         .feedback-link:hover {
+            color: #ff7f50;
             text-decoration: underline;
+            text-shadow: 2px 2px 4px #000;
         }
 
         /* Image Styling */
@@ -312,67 +337,77 @@
     }
 
 
-    .artist-button {
+    .halloween-button {
         position: relative;
-        width: 160px;
-        height: 50px;
-        background: linear-gradient(135deg, #87ceeb, #4682b4); /* sky blue gradient */
-        border-radius: 25px;
-        border: 2px solid #4169e1;
-        font-size: 16px;
+        width: 180px;
+        height: 60px;
+        background: linear-gradient(135deg, #ff6b35, #d2691e, #8b4513); /* orange to brown gradient */
+        border-radius: 30px;
+        border: 3px solid #ff4500;
+        font-size: 18px;
         font-weight: bold;
         text-transform: uppercase;
-        color: #ffffff; /* white text for contrast */
-        letter-spacing: 1px;
+        color: #fff;
+        letter-spacing: 2px;
         cursor: pointer;
-        transition: transform 0.2s ease, background 0.3s ease;
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.2);
         overflow: hidden;
+        text-shadow: 2px 2px 4px #000;
     }
 
-    .artist-button:hover {
-        background: linear-gradient(135deg, #7bb8e8, #3a7bb8);
-        transform: scale(1.03);
+    .halloween-button:hover {
+        background: linear-gradient(135deg, #ff7f50, #ff6347, #a0522d);
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.3);
     }
 
-    .artist-button:active {
-        transform: scale(0.97) translateY(2px);
-        background: linear-gradient(135deg, #5f9ea0, #2f4f4f);
+    .halloween-button:active {
+        transform: scale(0.98) translateY(2px);
+        background: linear-gradient(135deg, #ff4500, #cd853f, #8b4513);
     }
 
-    /* Floating suns for sky theme */
-    .artist-button::before,
-    .artist-button::after {
-        content: "☀️";
+    /* Floating pumpkins and ghosts */
+    .halloween-button::before,
+    .halloween-button::after {
         position: absolute;
         top: 50%;
-        font-size: 14px;
-        color: rgba(255, 255, 255, 0.8);
+        font-size: 16px;
         opacity: 0;
-        animation: floatSun 2s ease-in-out infinite;
+        animation: floatSpooky 2.5s ease-in-out infinite;
     }
 
-    .artist-button::before {
-        left: 20%;
+    .halloween-button::before {
+        content: "🎃";
+        left: 15%;
         animation-delay: 0s;
     }
 
-    .artist-button::after {
-        left: 80%;
-        animation-delay: 0.5s;
+    .halloween-button::after {
+        content: "👻";
+        left: 85%;
+        animation-delay: 1s;
     }
 
-    @keyframes floatSun {
+    @keyframes floatSpooky {
         0% {
-            transform: translateY(0) scale(1);
+            transform: translateY(0) scale(1) rotate(0deg);
             opacity: 0;
         }
+        25% {
+            transform: translateY(-10px) scale(1.2) rotate(5deg);
+            opacity: 0.8;
+        }
         50% {
-            transform: translateY(-12px) scale(1.3);
+            transform: translateY(-20px) scale(1.4) rotate(-5deg);
             opacity: 1;
         }
+        75% {
+            transform: translateY(-15px) scale(1.1) rotate(3deg);
+            opacity: 0.6;
+        }
         100% {
-            transform: translateY(-25px) scale(1.6);
+            transform: translateY(-30px) scale(1.6) rotate(-3deg);
             opacity: 0;
         }
     }
@@ -421,16 +456,16 @@
         Remaining Treats: <span id="treat-count">{{ treats }}</span>
     </p>
 
-    <button id="feed-button" class="artist-button">Give Treat</button>
+    <button id="feed-button" class="halloween-button">🎃 Give Treat 👻</button>
 
-    <!-- Fan Art Call-to-Action -->
-    <div style="background: linear-gradient(135deg, #e3f2fd, #bbdefb); border: 2px solid #2196f3; border-radius: 15px; padding: 20px; margin: 20px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-        <h3 style="color: #1565c0; margin-top: 0;">Want to show off Apollo Art?</h3>
-        <p style="color: #1565c0; font-size: 16px; margin-bottom: 15px;">
-            We're accepting art all through August! 
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfDo9Ngmc1AXJ911c3-hoW5ozNJdYm5SWyE1O7KtS1A1UNiag/viewform?usp=sharing&ouid=104858452339532607895" target="_blank" style="color: #d63384; font-weight: bold;">Click here to submit your art</a> 
+    <!-- Spooky Art Call-to-Action -->
+    <div style="background: linear-gradient(135deg, #2c1810, #1a0f0a); border: 3px solid #ff6b35; border-radius: 15px; padding: 25px; margin: 20px 0; box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255, 107, 53, 0.2);">
+        <h3 style="color: #ff6b35; margin-top: 0; text-shadow: 2px 2px 4px #000;">🎨 Want to show off Spooky Apollo Art? 👻</h3>
+        <p style="color: #fff; font-size: 16px; margin-bottom: 15px; text-shadow: 1px 1px 2px #000;">
+            We're accepting Halloween-themed art! 
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfDo9Ngmc1AXJ911c3-hoW5ozNJdYm5SWyE1O7KtS1A1UNiag/viewform?usp=sharing&ouid=104858452339532607895" target="_blank" style="color: #ff6b35; font-weight: bold; text-shadow: 1px 1px 2px #000;">Click here to submit your spooky art</a> 
             or 
-            <a href="https://drive.google.com/file/d/1afYQKjzSMbVw2IiL3rrXac72ZDHAPqCH/view" target="_blank" style="color: #d63384; font-weight: bold;">download a printable Apollo coloring page</a>!
+            <a href="https://drive.google.com/file/d/1afYQKjzSMbVw2IiL3rrXac72ZDHAPqCH/view" target="_blank" style="color: #ff6b35; font-weight: bold; text-shadow: 1px 1px 2px #000;">download a printable Apollo coloring page</a>!
         </p>
     </div>
 
@@ -439,9 +474,9 @@
         <button id="close-popup">Close</button>
     </div>
 
-    <!-- Featured Fan Art -->
-    <div style="margin: 40px 0; padding: 20px; background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-        <h2 style="color: #495057; margin-bottom: 25px;">Featured Art</h2>
+    <!-- Featured Spooky Art -->
+    <div style="margin: 40px 0; padding: 25px; background: linear-gradient(135deg, #2c1810, #1a0f0a); border: 3px solid #ff6b35; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255, 107, 53, 0.2);">
+        <h2 style="color: #ff6b35; margin-bottom: 25px; text-shadow: 2px 2px 4px #000;">🎨 Featured Spooky Art 👻</h2>
         
         {% if fan_art %}
             <div style="text-align: center;">
@@ -450,13 +485,13 @@
                     <img src="{{ url_for('static', filename='apollo-fan-art/' + art.filename) }}" 
                          alt="{{ art.title }} by {{ art.artist }}" 
                          style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); margin-bottom: 15px;">
-                    <h4 style="color: #495057; margin: 5px 0; font-size: 20px;">{{ art.title }}</h4>
-                    <p style="color: #6c757d; font-style: italic; margin: 0; font-size: 16px;">by {{ art.artist }}</p>
+                    <h4 style="color: #ff6b35; margin: 5px 0; font-size: 20px; text-shadow: 1px 1px 2px #000;">{{ art.title }}</h4>
+                    <p style="color: #fff; font-style: italic; margin: 0; font-size: 16px; text-shadow: 1px 1px 2px #000;">by {{ art.artist }}</p>
                 </div>
                 {% endfor %}
             </div>
         {% else %}
-            <p style="color: #6c757d; font-style: italic;">No fan art submitted yet. Be the first!</p>
+            <p style="color: #fff; font-style: italic; text-shadow: 1px 1px 2px #000;">No spooky art submitted yet. Be the first! 👻</p>
         {% endif %}
     </div>
 
@@ -465,8 +500,8 @@
         <a href="https://docs.google.com/forms/d/e/1FAIpQLSfISOQprM4Hh7om69-7SvcUqM7ZxviBe-g-_Ch2rKHAGEEHRg/viewform?usp=sf_link" class="feedback-link">Questions? Feedback? <strong>Contact us!</strong></a>
     </p>
 
-    <!-- Apollo Image -->
-    <!-- <img src="/static/apollo-art.png" alt="Apollo" class="apollo-image"> -->
+    <!-- Spooky Apollo Image -->
+    <img src="/static/apollo-halloween.png" alt="Spooky Apollo" class="apollo-image" style="margin-top: 30px; max-width: 100%; height: auto; border-radius: 15px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);">
 
     <script>
         document.getElementById('feed-button').addEventListener('click', function () {
