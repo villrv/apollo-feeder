@@ -145,7 +145,7 @@ def led_test():
     
     # Turn all LEDs on with a nice Halloween orange color
     for i in range(strip.numPixels()):
-        strip.setPixelColor(i, Color(255, 107, 53))  # Halloween Orange
+        strip.setPixelColor(i, Color(255, 128, 0))  # Orange
     strip.show()
     
     # Wait for 3 seconds
