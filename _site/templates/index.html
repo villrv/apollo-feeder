@@ -456,44 +456,14 @@
         Remaining Treats: <span id="treat-count">{{ treats }}</span>
     </p>
 
-    <button id="feed-button" class="halloween-button">🎃 Give Treat 👻</button>
+    <button id="feed-button" class="halloween-button">Give Treat</button>
 
-    <!-- Spooky Art Call-to-Action -->
-    <div style="background: linear-gradient(135deg, #2c1810, #1a0f0a); border: 3px solid #ff6b35; border-radius: 15px; padding: 25px; margin: 20px 0; box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255, 107, 53, 0.2);">
-        <h3 style="color: #ff6b35; margin-top: 0; text-shadow: 2px 2px 4px #000;">🎨 Want to show off Spooky Apollo Art? 👻</h3>
-        <p style="color: #fff; font-size: 16px; margin-bottom: 15px; text-shadow: 1px 1px 2px #000;">
-            We're accepting Halloween-themed art! 
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfDo9Ngmc1AXJ911c3-hoW5ozNJdYm5SWyE1O7KtS1A1UNiag/viewform?usp=sharing&ouid=104858452339532607895" target="_blank" style="color: #ff6b35; font-weight: bold; text-shadow: 1px 1px 2px #000;">Click here to submit your spooky art</a> 
-            or 
-            <a href="https://drive.google.com/file/d/1afYQKjzSMbVw2IiL3rrXac72ZDHAPqCH/view" target="_blank" style="color: #ff6b35; font-weight: bold; text-shadow: 1px 1px 2px #000;">download a printable Apollo coloring page</a>!
-        </p>
-    </div>
 
     <div id="popup">
         <p id="popup-message"></p>
         <button id="close-popup">Close</button>
     </div>
 
-    <!-- Featured Spooky Art -->
-    <div style="margin: 40px 0; padding: 25px; background: linear-gradient(135deg, #2c1810, #1a0f0a); border: 3px solid #ff6b35; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255, 107, 53, 0.2);">
-        <h2 style="color: #ff6b35; margin-bottom: 25px; text-shadow: 2px 2px 4px #000;">🎨 Featured Spooky Art 👻</h2>
-        
-        {% if fan_art %}
-            <div style="text-align: center;">
-                {% for art in fan_art %}
-                <div style="display: inline-block; max-width: 400px;">
-                    <img src="{{ url_for('static', filename='apollo-fan-art/' + art.filename) }}" 
-                         alt="{{ art.title }} by {{ art.artist }}" 
-                         style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); margin-bottom: 15px;">
-                    <h4 style="color: #ff6b35; margin: 5px 0; font-size: 20px; text-shadow: 1px 1px 2px #000;">{{ art.title }}</h4>
-                    <p style="color: #fff; font-style: italic; margin: 0; font-size: 16px; text-shadow: 1px 1px 2px #000;">by {{ art.artist }}</p>
-                </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <p style="color: #fff; font-style: italic; text-shadow: 1px 1px 2px #000;">No spooky art submitted yet. Be the first! 👻</p>
-        {% endif %}
-    </div>
 
     <!-- Google Form Link -->
     <p>
