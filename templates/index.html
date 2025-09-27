@@ -368,50 +368,6 @@
         background: linear-gradient(135deg, #ff4500, #cd853f, #8b4513);
     }
 
-    /* Floating pumpkins and ghosts */
-    .halloween-button::before,
-    .halloween-button::after {
-        position: absolute;
-        top: 50%;
-        font-size: 16px;
-        opacity: 0;
-        animation: floatSpooky 2.5s ease-in-out infinite;
-    }
-
-    .halloween-button::before {
-        content: "🎃";
-        left: 15%;
-        animation-delay: 0s;
-    }
-
-    .halloween-button::after {
-        content: "👻";
-        left: 85%;
-        animation-delay: 1s;
-    }
-
-    @keyframes floatSpooky {
-        0% {
-            transform: translateY(0) scale(1) rotate(0deg);
-            opacity: 0;
-        }
-        25% {
-            transform: translateY(-10px) scale(1.2) rotate(5deg);
-            opacity: 0.8;
-        }
-        50% {
-            transform: translateY(-20px) scale(1.4) rotate(-5deg);
-            opacity: 1;
-        }
-        75% {
-            transform: translateY(-15px) scale(1.1) rotate(3deg);
-            opacity: 0.6;
-        }
-        100% {
-            transform: translateY(-30px) scale(1.6) rotate(-3deg);
-            opacity: 0;
-        }
-    }
 
 
     @keyframes floatPetal {
@@ -459,12 +415,10 @@
 
     <button id="feed-button" class="halloween-button">Give Treat</button>
 
-
     <div id="popup">
         <p id="popup-message"></p>
         <button id="close-popup">Close</button>
     </div>
-
 
     <!-- Spooky Apollo Image -->
     <img src="/static/apollo-halloween.png" alt="Spooky Apollo" class="apollo-image" style="margin-top: 30px; max-width: 100%; height: auto; border-radius: 15px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);">
