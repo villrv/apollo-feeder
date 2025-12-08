@@ -3,36 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apollo's Spooky Feeder 🎃</title>
+    <title>Apollo's Festive Feeder 🎄</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             padding: 50px;
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-            color: #fff;
+            background: linear-gradient(to bottom, #fff 0%, #f8f9fa 100%);
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(220, 20, 60, 0.03) 10px, rgba(220, 20, 60, 0.03) 20px),
+                repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(26, 77, 46, 0.03) 10px, rgba(26, 77, 46, 0.03) 20px);
+            color: #000;
             min-height: 100vh;
             margin: 0;
         }
 
         h1 {
-            font-family: 'Creepster', cursive, Arial, sans-serif;
-            color: #ff6b35;
-            text-shadow: 3px 3px 6px #000;
+            font-family: 'Georgia', serif, Arial, sans-serif;
+            color: #dc143c;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
             font-size: 3em;
             margin-bottom: 20px;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            from { text-shadow: 3px 3px 6px #000, 0 0 20px #ff6b35; }
-            to { text-shadow: 3px 3px 6px #000, 0 0 30px #ff6b35, 0 0 40px #ff6b35; }
+            font-weight: bold;
+            padding: 20px;
+            border-top: 4px solid #dc143c;
+            border-bottom: 4px solid #1a4d2e;
+            display: inline-block;
+            margin-top: 20px;
         }
 
         #treat-count {
             font-size: 28px;  
-            color: #ff6b35;
-            text-shadow: 2px 2px 4px #000;
+            color: #1a4d2e;
+            text-shadow: none;
             font-weight: bold;
         }
 
@@ -110,54 +113,50 @@
         }
 
 
-        /* Spooky Pop-Up Styling */
+        /* Festive Pop-Up Styling */
         #popup {
             display: none;
             position: fixed;
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #2c1810, #1a0f0a);
+            background: #fff;
             padding: 25px;
-            border: 3px solid #ff6b35;
+            border: 3px solid #dc143c;
             border-radius: 15px;
-            box-shadow: 0 0 20px rgba(255, 107, 53, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             z-index: 100;
-            color: #fff;
-            text-shadow: 1px 1px 2px #000;
+            color: #000;
         }
 
         #popup button {
-            background: linear-gradient(135deg, #ff6b35, #d2691e);
-            border: 2px solid #ff4500;
+            background: linear-gradient(135deg, #dc143c, #b22222);
+            border: none;
             border-radius: 8px;
             padding: 12px 24px;
             color: #fff;
             cursor: pointer;
             font-weight: bold;
-            text-shadow: 1px 1px 2px #000;
             transition: all 0.3s ease;
         }
 
         #popup button:hover {
-            background: linear-gradient(135deg, #ff7f50, #ff6347);
+            background: linear-gradient(135deg, #ff1744, #d32f2f);
             transform: scale(1.05);
         }
 
-        /* Spooky Link Styling */
+        /* Festive Link Styling */
         .feedback-link {
             margin-top: 20px;
             font-size: 16px;
-            color: #ff6b35;
+            color: #1a4d2e;
             text-decoration: none;
-            text-shadow: 1px 1px 2px #000;
             transition: all 0.3s ease;
         }
 
         .feedback-link:hover {
-            color: #ff7f50;
+            color: #dc143c;
             text-decoration: underline;
-            text-shadow: 2px 2px 4px #000;
         }
 
         /* Image Styling */
@@ -338,15 +337,15 @@
     }
 
 
-    .halloween-button {
+    .christmas-button {
         position: relative;
         display: block;
         width: 180px;
         height: 60px;
         margin: 20px auto;
-        background: linear-gradient(135deg, #ff6b35, #d2691e, #8b4513); /* orange to brown gradient */
+        background: linear-gradient(135deg, #dc143c, #b22222, #8b0000); /* red gradient */
         border-radius: 30px;
-        border: 3px solid #ff4500;
+        border: none;
         font-size: 18px;
         font-weight: bold;
         text-transform: uppercase;
@@ -354,20 +353,20 @@
         letter-spacing: 2px;
         cursor: pointer;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.2);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.2), 0 0 0 3px #1a4d2e;
         overflow: hidden;
         text-shadow: 2px 2px 4px #000;
     }
 
-    .halloween-button:hover {
-        background: linear-gradient(135deg, #ff7f50, #ff6347, #a0522d);
+    .christmas-button:hover {
+        background: linear-gradient(135deg, #ff1744, #d32f2f, #b71c1c);
         transform: scale(1.05);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3), 0 0 0 4px #1a4d2e;
     }
 
-    .halloween-button:active {
+    .christmas-button:active {
         transform: scale(0.98) translateY(2px);
-        background: linear-gradient(135deg, #ff4500, #cd853f, #8b4513);
+        background: linear-gradient(135deg, #c62828, #b71c1c, #8b0000);
     }
 
 
@@ -415,16 +414,16 @@
         Remaining Treats: <span id="treat-count">{{ treats }}</span>
     </p>
 
-    <button id="feed-button" class="halloween-button">Give Treat</button>
+    <button id="feed-button" class="christmas-button">Give Treat</button>
 
     <div id="popup">
         <p id="popup-message"></p>
         <button id="close-popup">Close</button>
     </div>
 
-    <!-- Spooky Apollo Image -->
+    <!-- Festive Apollo Image -->
     <div style="margin-top: 30px; text-align: center;">
-        <img src="/static/apollo-halloween.png" alt="Spooky Apollo" class="apollo-image" style="max-width: 100%; height: auto; border-radius: 15px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);">
+        <img src="/static/apollo-festive.gif" alt="Festive Apollo" class="apollo-image" style="max-width: 100%; height: auto; border-radius: 15px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);">
     </div>
 
     <!-- Google Form Link -->

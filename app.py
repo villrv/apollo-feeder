@@ -136,29 +136,70 @@ def set_servo_angle(angle):
     servo.ChangeDutyCycle(0)  # Stop the PWM signal
 
 
-def led_test():
-    """Simple LED test: turn all lights on for 3 seconds, then off."""
+def set_christmas_pattern():
+    """Set alternating red and green pattern on all LEDs."""
     if not ENABLE_LIGHTS:
         return
-        
-    logger.info("Starting LED test - turning lights on")
     
-    # Turn all LEDs on with a nice Halloween orange color
     # NOTE: This LED strip uses GRB channel order (not RGB)
     # So Color(R, G, B) actually displays as (G, R, B)
-    # For orange: Color(100, 255, 0) = Green=100, Red=255, Blue=0
+    # Red: Color(0, 255, 0) = Green=0, Red=255, Blue=0
+    # Green: Color(255, 0, 0) = Green=255, Red=0, Blue=0
+    # White: Color(255, 255, 255) = Green=255, Red=255, Blue=255
     for i in range(strip.numPixels()):
-        strip.setPixelColor(i, Color(100, 255, 0))  # Much more red, less green
+        if i % 2 == 0:
+            strip.setPixelColor(i, Color(0, 255, 0))  # Red
+        else:
+            strip.setPixelColor(i, Color(255, 0, 0))  # Green
     strip.show()
+
+
+def twinkle_effect():
+    """Twinkle effect with white, red, and green for Christmas."""
+    if not ENABLE_LIGHTS:
+        return
     
-    # Wait for 3 seconds
-    time.sleep(3)
+    logger.info("Starting twinkle effect")
     
-    # Turn all LEDs off
-    logger.info("LED test complete - turning lights off")
-    for i in range(strip.numPixels()):
-        strip.setPixelColor(i, Color(0, 0, 0))  # Off
-    strip.show()
+    # Twinkle for about 3 seconds
+    twinkle_duration = 3.0
+    start_time = time.time()
+    num_twinkles = 0
+    
+    while time.time() - start_time < twinkle_duration:
+        # Randomly select some LEDs to twinkle
+        num_to_twinkle = random.randint(5, 15)
+        twinkled_indices = random.sample(range(strip.numPixels()), min(num_to_twinkle, strip.numPixels()))
+        
+        # Save current colors
+        saved_colors = []
+        for idx in twinkled_indices:
+            saved_colors.append((idx, strip.getPixelColor(idx)))
+        
+        # Set twinkling colors (white, red, or green randomly)
+        colors = [
+            Color(255, 255, 255),  # White
+            Color(0, 255, 0),      # Red
+            Color(255, 0, 0)       # Green
+        ]
+        for idx in twinkled_indices:
+            strip.setPixelColor(idx, random.choice(colors))
+        strip.show()
+        
+        time.sleep(0.15)  # Twinkle duration
+        
+        # Restore original colors
+        for idx, original_color in saved_colors:
+            if idx % 2 == 0:
+                strip.setPixelColor(idx, Color(0, 255, 0))  # Red
+            else:
+                strip.setPixelColor(idx, Color(255, 0, 0))  # Green
+        strip.show()
+        
+        time.sleep(0.1)  # Pause between twinkles
+        num_twinkles += 1
+    
+    logger.info(f"Twinkle effect complete ({num_twinkles} twinkles)")
 
 
 def reset_treats():
@@ -208,17 +249,20 @@ def give_treat():
         message = "Apollo got a treat!"
         save_ip_address(user_ip)
 
-        # Start the treat dispensing and LED test in a separate thread
+        # Start the treat dispensing and LED twinkle in a separate thread
         def treat_dispensing():
-            # LED test - turn lights on for 3 seconds
-            led_test()
-            
-            # Servo dispensing logic
+            # Servo dispensing logic FIRST
             if ENABLE_SERVO:
                 set_servo_angle(36 + 18)  # Rotate the servo
                 time.sleep(1)
                 set_servo_angle(18)
                 time.sleep(1)
+            
+            # Then twinkle effect
+            twinkle_effect()
+            
+            # Restore Christmas pattern after twinkle
+            set_christmas_pattern()
 
         # Run treat dispensing asynchronously
         threading.Thread(target=treat_dispensing).start()
@@ -238,11 +282,9 @@ def thank_you():
 
 
 def startup():
-    # Turn off all LEDs on startup
+    # Set Christmas pattern on startup (alternating red and green)
     if ENABLE_LIGHTS:
-        for i in range(strip.numPixels()):
-            strip.setPixelColor(i, Color(0, 0, 0))  # Off
-        strip.show()
+        set_christmas_pattern()
     reset_ip_tracking()
 
 
