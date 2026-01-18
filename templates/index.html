@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apollo's Festive Feeder 🎄</title>
+    <title>Apollo's Winter Feeder ❄️</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             padding: 50px;
-            background: linear-gradient(to bottom, #fff 0%, #f8f9fa 100%);
-            background-image: 
-                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(220, 20, 60, 0.03) 10px, rgba(220, 20, 60, 0.03) 20px),
-                repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(26, 77, 46, 0.03) 10px, rgba(26, 77, 46, 0.03) 20px);
+            background: linear-gradient(to bottom, #e8f4f8 0%, #d0e8f0 50%, #b8dce8 100%);
             color: #000;
             min-height: 100vh;
             margin: 0;
@@ -20,21 +17,21 @@
 
         h1 {
             font-family: 'Georgia', serif, Arial, sans-serif;
-            color: #dc143c;
+            color: #2c5f8d;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
             font-size: 3em;
             margin-bottom: 20px;
             font-weight: bold;
             padding: 20px;
-            border-top: 4px solid #dc143c;
-            border-bottom: 4px solid #1a4d2e;
+            border-top: 4px solid #4682b4;
+            border-bottom: 4px solid #4682b4;
             display: inline-block;
             margin-top: 20px;
         }
 
         #treat-count {
             font-size: 28px;  
-            color: #1a4d2e;
+            color: #4682b4;
             text-shadow: none;
             font-weight: bold;
         }
@@ -113,7 +110,7 @@
         }
 
 
-        /* Festive Pop-Up Styling */
+        /* Winter Pop-Up Styling */
         #popup {
             display: none;
             position: fixed;
@@ -122,7 +119,7 @@
             transform: translate(-50%, -50%);
             background: #fff;
             padding: 25px;
-            border: 3px solid #dc143c;
+            border: 3px solid #4682b4;
             border-radius: 15px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             z-index: 100;
@@ -130,7 +127,7 @@
         }
 
         #popup button {
-            background: linear-gradient(135deg, #dc143c, #b22222);
+            background: linear-gradient(135deg, #4682b4, #5a9bd4);
             border: none;
             border-radius: 8px;
             padding: 12px 24px;
@@ -141,21 +138,21 @@
         }
 
         #popup button:hover {
-            background: linear-gradient(135deg, #ff1744, #d32f2f);
+            background: linear-gradient(135deg, #5a9bd4, #6bb6ff);
             transform: scale(1.05);
         }
 
-        /* Festive Link Styling */
+        /* Winter Link Styling */
         .feedback-link {
             margin-top: 20px;
             font-size: 16px;
-            color: #1a4d2e;
+            color: #4682b4;
             text-decoration: none;
             transition: all 0.3s ease;
         }
 
         .feedback-link:hover {
-            color: #dc143c;
+            color: #2c5f8d;
             text-decoration: underline;
         }
 
@@ -343,7 +340,7 @@
         width: 180px;
         height: 60px;
         margin: 20px auto;
-        background: linear-gradient(135deg, #dc143c, #b22222, #8b0000); /* red gradient */
+        background: linear-gradient(135deg, #4682b4, #5a9bd4, #6bb6ff); /* winter blue gradient */
         border-radius: 30px;
         border: none;
         font-size: 18px;
@@ -353,20 +350,20 @@
         letter-spacing: 2px;
         cursor: pointer;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.2), 0 0 0 3px #1a4d2e;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.2), 0 0 0 3px #87ceeb;
         overflow: hidden;
         text-shadow: 2px 2px 4px #000;
     }
 
     .christmas-button:hover {
-        background: linear-gradient(135deg, #ff1744, #d32f2f, #b71c1c);
+        background: linear-gradient(135deg, #5a9bd4, #6bb6ff, #7dc8ff);
         transform: scale(1.05);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3), 0 0 0 4px #1a4d2e;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3), 0 0 0 4px #87ceeb;
     }
 
     .christmas-button:active {
         transform: scale(0.98) translateY(2px);
-        background: linear-gradient(135deg, #c62828, #b71c1c, #8b0000);
+        background: linear-gradient(135deg, #2c5f8d, #4682b4, #5a9bd4);
     }
 
 
@@ -421,9 +418,9 @@
         <button id="close-popup">Close</button>
     </div>
 
-    <!-- Festive Apollo Image -->
+    <!-- Winter Apollo Image -->
     <div style="margin-top: 30px; text-align: center;">
-        <img src="/static/apollo-festive.gif" alt="Festive Apollo" class="apollo-image" style="max-width: 100%; height: auto; border-radius: 15px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);">
+        <img src="/static/apollo-winter-gif.gif" alt="Winter Apollo" class="apollo-image" style="max-width: 100%; height: auto; border-radius: 15px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);">
     </div>
 
     <!-- Google Form Link -->
