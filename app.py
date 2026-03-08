@@ -145,36 +145,43 @@ def turn_leds_off():
     strip.show()
 
 
-def flicker_blue_white():
-    """Flicker effect with blue and white for winter."""
+def flicker_green():
+    """Twinkle effect with green (and a bit of white/gold) for St. Patrick's Day."""
     if not ENABLE_LIGHTS:
         return
     
-    logger.info("Starting blue and white flicker effect")
+    logger.info("Starting green twinkle effect")
     
     # NOTE: This LED strip uses GRB channel order (not RGB)
     # So Color(R, G, B) actually displays as (G, R, B)
-    # Blue: Color(0, 0, 255) = Green=0, Red=0, Blue=255
-    # White: Color(255, 255, 255) = Green=255, Red=255, Blue=255
+    # Green: Color(255, 0, 0) = Green=255, Red=0, Blue=0
+    # White: Color(255, 255, 255)
     
-    # Flicker for about 5 seconds
-    flicker_duration = 5.0
+    twinkle_duration = 5.0
     start_time = time.time()
     
-    while time.time() - start_time < flicker_duration:
-        # Randomly set each LED to blue or white
+    while time.time() - start_time < twinkle_duration:
+        # Randomly pick LEDs to twinkle
+        num_to_twinkle = random.randint(5, 20)
+        twinkled = random.sample(range(strip.numPixels()), min(num_to_twinkle, strip.numPixels()))
+        
+        # Set twinkling LEDs to green or white
+        colors = [
+            Color(255, 0, 0),       # Green
+            Color(255, 255, 255),  # White
+            Color(200, 0, 0),      # Dimmer green
+        ]
         for i in range(strip.numPixels()):
-            if random.random() < 0.5:
-                strip.setPixelColor(i, Color(0, 0, 255))  # Blue
+            if i in twinkled:
+                strip.setPixelColor(i, random.choice(colors))
             else:
-                strip.setPixelColor(i, Color(255, 255, 255))  # White
+                strip.setPixelColor(i, Color(0, 0, 0))  # Off
         strip.show()
         
-        time.sleep(0.1)  # Flicker speed
+        time.sleep(0.12)
     
-    logger.info("Flicker effect complete")
+    logger.info("Green twinkle effect complete")
     
-    # Turn all LEDs off after flickering
     turn_leds_off()
 
 
@@ -195,7 +202,7 @@ scheduler.start()
 @app.route("/")
 def home():
     logger.info("=== HOME ROUTE CALLED ===")
-    bones = "🎄 " * treats_left  # Display the remaining treats as Christmas tree emojis
+    bones = "🍀 " * treats_left  # Display the remaining treats as clover emojis
     fan_art_metadata = load_fan_art_metadata()
     logger.info(f"Fan art metadata returned: {fan_art_metadata}")
     return render_template("index.html", treats=bones.strip(), fan_art=fan_art_metadata)
@@ -234,14 +241,14 @@ def give_treat():
                 set_servo_angle(18)
                 time.sleep(1)
             
-            # Then flicker blue and white effect (turns off automatically after)
-            flicker_blue_white()
+            # Then green light effect (turns off automatically after)
+            flicker_green()
 
         # Run treat dispensing asynchronously
         threading.Thread(target=treat_dispensing).start()
 
         # Immediately respond with a success message
-        bones = "🎄 " * treats_left  # Display the remaining treats as Christmas tree emojis
+        bones = "🍀 " * treats_left  # Display the remaining treats as clover emojis
         return jsonify({"treats_left": bones.strip(), "message": message})
 
     else:
