@@ -145,42 +145,42 @@ def turn_leds_off():
     strip.show()
 
 
-def flicker_green():
-    """Twinkle effect with green (and a bit of white/gold) for St. Patrick's Day."""
+def flicker_birthday():
+    """Party twinkle: multicolor for birthday (strip is GRB order)."""
     if not ENABLE_LIGHTS:
         return
     
-    logger.info("Starting green twinkle effect")
+    logger.info("Starting birthday twinkle effect")
     
     # NOTE: This LED strip uses GRB channel order (not RGB)
-    # So Color(R, G, B) actually displays as (G, R, B)
-    # Green: Color(255, 0, 0) = Green=255, Red=0, Blue=0
-    # White: Color(255, 255, 255)
+    # Color(R, G, B) displays as (G, R, B) on the strip
+    party_colors = [
+        Color(0, 255, 0),       # red
+        Color(255, 0, 0),       # green
+        Color(0, 0, 255),       # blue
+        Color(255, 255, 255),   # white
+        Color(255, 255, 0),     # yellow
+        Color(255, 0, 255),     # cyan
+        Color(0, 255, 255),     # magenta / purple-ish
+    ]
     
     twinkle_duration = 5.0
     start_time = time.time()
     
     while time.time() - start_time < twinkle_duration:
-        # Randomly pick LEDs to twinkle
-        num_to_twinkle = random.randint(5, 20)
+        num_to_twinkle = random.randint(8, 25)
         twinkled = random.sample(range(strip.numPixels()), min(num_to_twinkle, strip.numPixels()))
         
-        # Set twinkling LEDs to green or white
-        colors = [
-            Color(255, 0, 0),       # Green
-            Color(255, 255, 255),  # White
-            Color(200, 0, 0),      # Dimmer green
-        ]
         for i in range(strip.numPixels()):
             if i in twinkled:
-                strip.setPixelColor(i, random.choice(colors))
+                strip.setPixelColor(i, random.choice(party_colors))
             else:
-                strip.setPixelColor(i, Color(0, 0, 0))  # Off
+                strip.setPixelColor(i, Color(0, 0, 0))
         strip.show()
         
         time.sleep(0.12)
     
-    logger.info("Green twinkle effect complete")
+    logger.info("Birthday twinkle effect complete")
     
     turn_leds_off()
 
@@ -202,7 +202,7 @@ scheduler.start()
 @app.route("/")
 def home():
     logger.info("=== HOME ROUTE CALLED ===")
-    bones = "🍀 " * treats_left  # Display the remaining treats as clover emojis
+    bones = "🎂 " * treats_left  # Display the remaining treats as birthday cake emojis
     fan_art_metadata = load_fan_art_metadata()
     logger.info(f"Fan art metadata returned: {fan_art_metadata}")
     return render_template("index.html", treats=bones.strip(), fan_art=fan_art_metadata)
@@ -241,14 +241,14 @@ def give_treat():
                 set_servo_angle(18)
                 time.sleep(1)
             
-            # Then green light effect (turns off automatically after)
-            flicker_green()
+            # Then birthday party twinkle (turns off automatically after)
+            flicker_birthday()
 
         # Run treat dispensing asynchronously
         threading.Thread(target=treat_dispensing).start()
 
         # Immediately respond with a success message
-        bones = "🍀 " * treats_left  # Display the remaining treats as clover emojis
+        bones = "🎂 " * treats_left  # Display the remaining treats as birthday cake emojis
         return jsonify({"treats_left": bones.strip(), "message": message})
 
     else:
