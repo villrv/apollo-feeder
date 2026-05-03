@@ -202,10 +202,10 @@ scheduler.start()
 @app.route("/")
 def home():
     logger.info("=== HOME ROUTE CALLED ===")
-    bones = "🎂 " * treats_left  # Display the remaining treats as birthday cake emojis
+    treat_icons = "🌸 " * treats_left
     fan_art_metadata = load_fan_art_metadata()
     logger.info(f"Fan art metadata returned: {fan_art_metadata}")
-    return render_template("index.html", treats=bones.strip(), fan_art=fan_art_metadata)
+    return render_template("index.html", treats=treat_icons.strip(), fan_art=fan_art_metadata)
 
 
 @app.route("/give_treat", methods=["POST"])
@@ -248,8 +248,8 @@ def give_treat():
         threading.Thread(target=treat_dispensing).start()
 
         # Immediately respond with a success message
-        bones = "🎂 " * treats_left  # Display the remaining treats as birthday cake emojis
-        return jsonify({"treats_left": bones.strip(), "message": message})
+        treat_icons = "🌸 " * treats_left
+        return jsonify({"treats_left": treat_icons.strip(), "message": message})
 
     else:
         message = "No more treats left for today!"

@@ -3,35 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy 11th Birthday, Apollo! 🎂</title>
+    <title>Happy May, Apollo!</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             padding: 50px;
-            background: linear-gradient(to bottom, #fff9f5 0%, #ffe4ec 40%, #e8d5ff 100%);
-            color: #000;
+            background:
+                radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255, 236, 244, 0.95), transparent 50%),
+                linear-gradient(to bottom, #fef8fb 0%, #fdeef4 35%, #f5e8f0 68%, #e8f4ec 100%);
+            color: #2d2d2d;
             min-height: 100vh;
             margin: 0;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            pointer-events: none;
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 15% 20%, rgba(255, 192, 212, 0.35) 0%, transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(255, 183, 197, 0.3) 0%, transparent 22%),
+                radial-gradient(circle at 70% 75%, rgba(255, 218, 230, 0.4) 0%, transparent 30%),
+                radial-gradient(circle at 25% 80%, rgba(255, 200, 210, 0.25) 0%, transparent 28%);
+            z-index: 0;
+        }
+
+        body > * {
+            position: relative;
+            z-index: 1;
         }
 
         h1 {
             font-family: 'Georgia', serif, Arial, sans-serif;
-            color: #d81b60;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.08);
+            color: #c2185b;
+            text-shadow: 1px 2px 0 rgba(255, 255, 255, 0.6);
             font-size: 2.4em;
             margin-bottom: 20px;
             font-weight: bold;
             padding: 20px;
-            border-top: 4px solid #ff9800;
-            border-bottom: 4px solid #7b1fa2;
+            border-top: 4px solid #f8bbd9;
+            border-bottom: 4px solid #ce93d8;
             display: inline-block;
             margin-top: 20px;
         }
 
         #treat-count {
-            font-size: 28px;  
-            color: #6a1b9a;
+            font-size: 28px;
+            color: #ad1457;
             text-shadow: none;
             font-weight: bold;
         }
@@ -117,17 +138,17 @@
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            background: #fff;
+            background: #fffafc;
             padding: 25px;
-            border: 3px solid #ff9800;
+            border: 3px solid #f48fb1;
             border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 24px rgba(194, 24, 91, 0.15);
             z-index: 100;
             color: #000;
         }
 
         #popup button {
-            background: linear-gradient(135deg, #d81b60, #ad1457);
+            background: linear-gradient(135deg, #ec407a, #c2185b);
             border: none;
             border-radius: 8px;
             padding: 12px 24px;
@@ -146,7 +167,7 @@
         .feedback-link {
             margin-top: 20px;
             font-size: 16px;
-            color: #6a1b9a;
+            color: #ad1457;
             text-decoration: none;
             transition: all 0.3s ease;
         }
@@ -384,6 +405,71 @@
         }
     }
 
+    /* May / cherry blossom — soft sakura + early summer */
+    .sakura-button {
+        position: relative;
+        display: block;
+        width: 200px;
+        height: 56px;
+        margin: 20px auto;
+        background: linear-gradient(135deg, #fff5f8 0%, #ffc9d9 45%, #f8bbd9 100%);
+        border-radius: 28px;
+        border: 2px solid #f48fb1;
+        font-size: 17px;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: #880e4f;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s ease;
+        box-shadow: 0 6px 16px rgba(194, 24, 91, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+        overflow: hidden;
+    }
+
+    .sakura-button:hover {
+        background: linear-gradient(135deg, #ffffff 0%, #ffd6e5 40%, #f9b4cc 100%);
+        transform: scale(1.04);
+        box-shadow: 0 8px 22px rgba(194, 24, 91, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+
+    .sakura-button:active {
+        transform: scale(0.98) translateY(2px);
+        box-shadow: 0 3px 10px rgba(194, 24, 91, 0.2);
+    }
+
+    .sakura-button::before,
+    .sakura-button::after {
+        content: "";
+        position: absolute;
+        inset: auto;
+        pointer-events: none;
+    }
+
+    .sakura-button::before {
+        content: "🌸";
+        left: 14%;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 15px;
+        opacity: 0.85;
+        animation: sakuraBob 2.2s ease-in-out infinite;
+    }
+
+    .sakura-button::after {
+        content: "🌸";
+        right: 12%;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 14px;
+        opacity: 0.75;
+        animation: sakuraBob 2.2s ease-in-out infinite 0.55s;
+    }
+
+    @keyframes sakuraBob {
+        0%, 100% { transform: translateY(-50%) rotate(-6deg); opacity: 0.6; }
+        50% { transform: translateY(-58%) rotate(6deg); opacity: 1; }
+    }
+
 
 .birthday-text {
     font-size: 18px;
@@ -407,12 +493,12 @@
 
 </head>
 <body>
-    <h1>Happy 11th Birthday, Apollo!</h1>
+    <h1>Happy May, Apollo!</h1>
     <p>
         Remaining Treats: <span id="treat-count">{{ treats }}</span>
     </p>
 
-    <button id="feed-button" class="christmas-button">Give Treat</button>
+    <button id="feed-button" class="sakura-button">Give Treat</button>
 
     <div id="popup">
         <p id="popup-message"></p>
@@ -421,7 +507,7 @@
 
     <!-- Apollo Image -->
     <div style="margin-top: 30px; text-align: center;">
-        <img src="/static/apollo-birthday.png" alt="Apollo — happy 11th birthday" class="apollo-image" style="max-width: 100%; height: auto; border-radius: 15px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);">
+        <img src="{{ url_for('static', filename='apollo-summer.png') }}" alt="Apollo — May, cherry blossom vibes" class="apollo-image" style="max-width: 100%; height: auto; border-radius: 15px; box-shadow: 0 10px 28px rgba(194, 24, 91, 0.2); border: 3px solid rgba(248, 187, 217, 0.9);">
     </div>
 
     <!-- Google Form Link -->
