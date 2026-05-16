@@ -8,6 +8,11 @@ dependencies = [
     "apscheduler>=3.11.0",
     "flask>=3.1.0",
     "gunicorn>=23.0.0",
+]
+
+[project.optional-dependencies]
+# Install on the Raspberry Pi only: pip install '.[pi]'
+pi = [
     "rpi-gpio>=0.7.1",
     "rpi-ws281x>=5.0.0",
 ]

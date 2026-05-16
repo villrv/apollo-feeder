@@ -7,11 +7,9 @@ import csv
 import logging
 from datetime import datetime
 
-import RPi.GPIO as GPIO
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from flask import Flask, jsonify, render_template, request
-from rpi_ws281x import PixelStrip, Color
 
 #####
 
@@ -42,20 +40,53 @@ treats_left = DEFAULT_TREATS
 # File to store IP addresses of users who have fed Apollo today
 IP_TRACKING_FILE = "fed_ip_addresses.txt"
 
-# Set up GPIO
-GPIO.setmode(GPIO.BCM)  # Use Broadcom pin numbering
-GPIO.setup(7, GPIO.OUT)  # Set GPIO pin 7 as output
+# Raspberry Pi-only: set APOLLO_HEADLESS=1 on a VPS if you prefer to skip probing hardware.
+GPIO = None
+servo = None
+strip = None
+Color = None
 
-# Set up PWM on the GPIO pin for the servo
-servo = GPIO.PWM(7, 50)  # GPIO 7 for PWM with 50Hz frequency
-servo.start(0)  # Initialize PWM with 0% duty cycle
 
-# Initialize the LED strip
-strip = PixelStrip(
-    LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL
-)
-strip.begin()
+def init_hardware():
+    """Attach GPIO servo + WS281x strip on a Pi; no-op safely on VPS / missing libs."""
+    global GPIO, servo, strip, Color
+    force_headless = os.environ.get("APOLLO_HEADLESS", "").lower() in ("1", "true", "yes")
+    if force_headless:
+        logger.info("APOLLO_HEADLESS: GPIO and LED strip disabled.")
+        return
+    try:
+        import RPi.GPIO as GPIO_mod
+        from rpi_ws281x import Color as NeoColor
+        from rpi_ws281x import PixelStrip
 
+        Color = NeoColor
+        GPIO_mod.setmode(GPIO_mod.BCM)
+        GPIO_mod.setup(7, GPIO_mod.OUT)
+        srv = GPIO_mod.PWM(7, 50)
+        srv.start(0)
+        st = PixelStrip(
+            LED_COUNT,
+            LED_PIN,
+            LED_FREQ_HZ,
+            LED_DMA,
+            LED_INVERT,
+            LED_BRIGHTNESS,
+            LED_CHANNEL,
+        )
+        st.begin()
+        GPIO = GPIO_mod
+        servo = srv
+        strip = st
+        logger.info("GPIO and LED strip initialized.")
+    except Exception as e:
+        logger.warning("Raspberry Pi hardware not available (%s); running without GPIO/LEDs.", e)
+        GPIO = None
+        servo = None
+        strip = None
+        Color = None
+
+
+init_hardware()
 
 
 def get_current_date():
@@ -110,9 +141,11 @@ def load_ip_addresses():
     if os.path.exists(IP_TRACKING_FILE):
         with open(IP_TRACKING_FILE, "r") as file:
             lines = file.readlines()
-            date = lines[0].strip()  # The first line should be the date
+            if not lines:
+                return set()
+            date = lines[0].strip()
             if date == get_current_date():
-                return set(line.strip() for line in lines[1:])
+                return set(line.strip() for line in lines[1:] if line.strip())
     return set()
 
 
@@ -130,6 +163,8 @@ def reset_ip_tracking():
 
 def set_servo_angle(angle):
     """Set the servo to a specific angle."""
+    if servo is None:
+        return
     duty_cycle = 2.5 + (angle / 18.0)  # Convert angle to duty cycle
     servo.ChangeDutyCycle(duty_cycle)
     time.sleep(0.5)  # Give the servo time to reach the position
@@ -138,7 +173,7 @@ def set_servo_angle(angle):
 
 def turn_leds_off():
     """Turn all LEDs off."""
-    if not ENABLE_LIGHTS:
+    if not ENABLE_LIGHTS or strip is None or Color is None:
         return
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, Color(0, 0, 0))  # Off
@@ -147,7 +182,7 @@ def turn_leds_off():
 
 def flicker_birthday():
     """Party twinkle: multicolor for birthday (strip is GRB order)."""
-    if not ENABLE_LIGHTS:
+    if not ENABLE_LIGHTS or strip is None or Color is None:
         return
     
     logger.info("Starting birthday twinkle effect")
@@ -269,10 +304,17 @@ def startup():
 
 
 def cleanup():
-    # Cleanup GPIO on exit
     scheduler.shutdown()
-    servo.stop()
-    GPIO.cleanup()
+    if servo is not None:
+        try:
+            servo.stop()
+        except Exception:
+            logger.debug("servo.stop() skipped", exc_info=True)
+    if GPIO is not None:
+        try:
+            GPIO.cleanup()
+        except Exception:
+            logger.debug("GPIO.cleanup() skipped", exc_info=True)
 
 
 # Reset IP tracking at the start of the application
