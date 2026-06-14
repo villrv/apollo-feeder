@@ -1,4 +1,6 @@
 fed_ip_addresses.txt
+AGENTS.local.md
 .env
 __pycache__/
 nohup.out
+_site/

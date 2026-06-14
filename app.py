@@ -14,7 +14,7 @@ from flask import Flask, jsonify, render_template, request
 #####
 
 DEFAULT_TREATS = 5
-ENABLE_SERVO = False
+ENABLE_SERVO = True
 ENABLE_LIGHTS = True
 
 # LED strip configuration for Pi 3
@@ -273,7 +273,7 @@ def give_treat():
             if ENABLE_SERVO:
                 set_servo_angle(36 + 18)  # Rotate the servo
                 time.sleep(1)
-                set_servo_angle(18)
+                set_servo_angle(13)  # Backtrack 5° further so the treat actually drops
                 time.sleep(1)
             
             # Then birthday party twinkle (turns off automatically after)
