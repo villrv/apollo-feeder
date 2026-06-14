@@ -273,7 +273,7 @@ def give_treat():
             if ENABLE_SERVO:
                 set_servo_angle(36 + 18)  # Rotate the servo
                 time.sleep(1)
-                set_servo_angle(13)  # Backtrack 5° further so the treat actually drops
+                set_servo_angle(23)  # Backtrack 5° further so the treat actually drops
                 time.sleep(1)
             
             # Then birthday party twinkle (turns off automatically after)
