@@ -271,9 +271,9 @@ def give_treat():
         def treat_dispensing():
             # Servo dispensing logic FIRST
             if ENABLE_SERVO:
-                set_servo_angle(63)  # Rotate forward to dispense
+                set_servo_angle(55)  # Rotate forward to dispense
                 time.sleep(1)
-                set_servo_angle(8)  # Return to rest
+                set_servo_angle(0)  # Return to rest
                 time.sleep(1)
             
             # Then birthday party twinkle (turns off automatically after)
