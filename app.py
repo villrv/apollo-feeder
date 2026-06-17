@@ -20,6 +20,7 @@ ENABLE_LIGHTS = True
 # "normal" = treat dispenser; "standby" = hardware down, kisses only
 APP_MODE = os.environ.get("APOLLO_MODE", "standby")
 KISSES_COUNT_FILE = "kisses_count.txt"
+KISS_COOLDOWN_SECONDS = 4
 
 # LED strip configuration for Pi 3
 LED_COUNT = 100  # Number of LED pixels
@@ -41,6 +42,8 @@ logger = logging.getLogger(__name__)
 # Variable to track the number of treats left
 treats_left = DEFAULT_TREATS
 kisses_sent = 0
+last_kiss_at = 0.0
+_kiss_light_lock = threading.Lock()
 
 # File to store IP addresses of users who have fed Apollo today
 IP_TRACKING_FILE = "fed_ip_addresses.txt"
@@ -258,35 +261,40 @@ def flicker_kiss():
     """Soft pink twinkle when Apollo gets a kiss (strip is GRB order)."""
     if not ENABLE_LIGHTS or strip is None or Color is None:
         return
+    if not _kiss_light_lock.acquire(blocking=False):
+        return
 
-    logger.info("Starting kiss twinkle effect")
+    try:
+        logger.info("Starting kiss twinkle effect")
 
-    kiss_colors = [
-        Color(180, 80, 255),    # pink
-        Color(220, 120, 255),   # light pink
-        Color(255, 150, 255),   # rose
-        Color(255, 200, 255),   # pale blush
-        Color(255, 100, 255),   # hot pink
-    ]
+        kiss_colors = [
+            Color(180, 80, 255),    # pink
+            Color(220, 120, 255),   # light pink
+            Color(255, 150, 255),   # rose
+            Color(255, 200, 255),   # pale blush
+            Color(255, 100, 255),   # hot pink
+        ]
 
-    twinkle_duration = 3.0
-    start_time = time.time()
+        twinkle_duration = 3.0
+        start_time = time.time()
 
-    while time.time() - start_time < twinkle_duration:
-        num_to_twinkle = random.randint(10, 30)
-        twinkled = random.sample(range(strip.numPixels()), min(num_to_twinkle, strip.numPixels()))
+        while time.time() - start_time < twinkle_duration:
+            num_to_twinkle = random.randint(10, 30)
+            twinkled = random.sample(range(strip.numPixels()), min(num_to_twinkle, strip.numPixels()))
 
-        for i in range(strip.numPixels()):
-            if i in twinkled:
-                strip.setPixelColor(i, random.choice(kiss_colors))
-            else:
-                strip.setPixelColor(i, Color(0, 0, 0))
-        strip.show()
+            for i in range(strip.numPixels()):
+                if i in twinkled:
+                    strip.setPixelColor(i, random.choice(kiss_colors))
+                else:
+                    strip.setPixelColor(i, Color(0, 0, 0))
+            strip.show()
 
-        time.sleep(0.1)
+            time.sleep(0.1)
 
-    logger.info("Kiss twinkle effect complete")
-    turn_leds_off()
+        logger.info("Kiss twinkle effect complete")
+        turn_leds_off()
+    finally:
+        _kiss_light_lock.release()
 
 
 def reset_treats():
@@ -320,10 +328,22 @@ def home():
 
 @app.route("/give_kiss", methods=["POST"])
 def give_kiss():
-    global kisses_sent
+    global kisses_sent, last_kiss_at
     if not is_standby_mode():
         return jsonify({"error": "Kisses are only available in standby mode."}), 403
 
+    now = time.time()
+    elapsed = now - last_kiss_at
+    if elapsed < KISS_COOLDOWN_SECONDS:
+        retry_after = int(KISS_COOLDOWN_SECONDS - elapsed + 0.99)
+        return jsonify(
+            {
+                "error": f"Give Apollo a moment! Try again in {retry_after}s 💋",
+                "retry_after": retry_after,
+            }
+        ), 429
+
+    last_kiss_at = now
     kisses_sent += 1
     save_kisses_count(kisses_sent)
     threading.Thread(target=flicker_kiss).start()
@@ -331,6 +351,7 @@ def give_kiss():
         {
             "kisses_sent": kisses_sent,
             "message": "Apollo got a kiss! 💋",
+            "cooldown_seconds": KISS_COOLDOWN_SECONDS,
         }
     )
 

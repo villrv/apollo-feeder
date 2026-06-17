@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if mode == 'standby' %}Apollo — standby{% else %}Apollo is a big brother!{% endif %}</title>
+    <title>Apollo's Feeder</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -296,7 +296,17 @@
         background: linear-gradient(135deg, #f4b1c8, #e996b5); /* Slightly darker pink */
     }
 
-    /* Floating hearts at two positions */
+    .valentine-button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .valentine-button:disabled:hover {
+        background: linear-gradient(135deg, #fddde6, #f8a8c9);
+        transform: none;
+    }
+
     .valentine-button::before,
     .valentine-button::after {
         content: "❤";
@@ -524,7 +534,7 @@
 </head>
 <body>
     {% if mode == 'standby' %}
-    <h1>We'll be right back!</h1>
+    <h1>Apollo's Feeder</h1>
     <p class="standby-message">
         Hardware is unfortunately down while we upgrade!<br>
         You can still send Apollo a kiss 💋
@@ -567,7 +577,41 @@
 
     <script>
         {% if mode == 'standby' %}
-        document.getElementById('kiss-button').addEventListener('click', function () {
+        const kissButton = document.getElementById('kiss-button');
+        let kissCooldownTimer = null;
+
+        function startKissCooldown(seconds) {
+            const wait = Math.max(1, Math.ceil(seconds));
+            kissButton.disabled = true;
+            const originalLabel = 'Send Kiss';
+            let remaining = wait;
+
+            kissButton.textContent = `Wait ${remaining}s...`;
+
+            if (kissCooldownTimer) {
+                clearInterval(kissCooldownTimer);
+            }
+
+            kissCooldownTimer = setInterval(function () {
+                remaining -= 1;
+                if (remaining <= 0) {
+                    clearInterval(kissCooldownTimer);
+                    kissCooldownTimer = null;
+                    kissButton.disabled = false;
+                    kissButton.textContent = originalLabel;
+                    return;
+                }
+                kissButton.textContent = `Wait ${remaining}s...`;
+            }, 1000);
+        }
+
+        kissButton.addEventListener('click', function () {
+            if (kissButton.disabled) {
+                return;
+            }
+
+            kissButton.disabled = true;
+
             fetch('/give_kiss', {
                 method: 'POST',
                 headers: {
@@ -578,7 +622,7 @@
             .then(response => {
                 if (!response.ok) {
                     return response.json().then(data => {
-                        throw new Error(data.error || "Unexpected error");
+                        throw { message: data.error || "Unexpected error", retryAfter: data.retry_after };
                     });
                 }
                 return response.json();
@@ -586,9 +630,11 @@
             .then(data => {
                 document.getElementById('kiss-count').innerText = data.kisses_sent;
                 showPopup(data.message);
+                startKissCooldown(data.cooldown_seconds || 4);
             })
             .catch(error => {
                 showPopup(error.message);
+                startKissCooldown(error.retryAfter || 4);
             });
         });
         {% else %}
