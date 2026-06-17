@@ -17,6 +17,10 @@ DEFAULT_TREATS = 5
 ENABLE_SERVO = True
 ENABLE_LIGHTS = True
 
+# "normal" = treat dispenser; "standby" = hardware down, kisses only
+APP_MODE = os.environ.get("APOLLO_MODE", "standby")
+KISSES_COUNT_FILE = "kisses_count.txt"
+
 # LED strip configuration for Pi 3
 LED_COUNT = 100  # Number of LED pixels
 LED_PIN = 18  # GPIO pin connected to the pixels (18 uses PWM!)
@@ -36,6 +40,7 @@ logger = logging.getLogger(__name__)
 
 # Variable to track the number of treats left
 treats_left = DEFAULT_TREATS
+kisses_sent = 0
 
 # File to store IP addresses of users who have fed Apollo today
 IP_TRACKING_FILE = "fed_ip_addresses.txt"
@@ -47,8 +52,16 @@ strip = None
 Color = None
 
 
+def is_standby_mode():
+    return APP_MODE.lower() == "standby"
+
+
+def servo_enabled():
+    return ENABLE_SERVO and not is_standby_mode()
+
+
 def init_hardware():
-    """Attach GPIO servo + WS281x strip on a Pi; no-op safely on VPS / missing libs."""
+    """Attach WS281x strip on a Pi; servo only when not in standby. No-op on VPS / missing libs."""
     global GPIO, servo, strip, Color
     force_headless = os.environ.get("APOLLO_HEADLESS", "").lower() in ("1", "true", "yes")
     if force_headless:
@@ -61,9 +74,13 @@ def init_hardware():
 
         Color = NeoColor
         GPIO_mod.setmode(GPIO_mod.BCM)
-        GPIO_mod.setup(7, GPIO_mod.OUT)
-        srv = GPIO_mod.PWM(7, 50)
-        srv.start(0)
+        if is_standby_mode():
+            logger.info("Standby mode: servo disabled, LED strip enabled.")
+            srv = None
+        else:
+            GPIO_mod.setup(7, GPIO_mod.OUT)
+            srv = GPIO_mod.PWM(7, 50)
+            srv.start(0)
         st = PixelStrip(
             LED_COUNT,
             LED_PIN,
@@ -77,7 +94,7 @@ def init_hardware():
         GPIO = GPIO_mod
         servo = srv
         strip = st
-        logger.info("GPIO and LED strip initialized.")
+        logger.info("LED strip initialized%s.", "" if srv else " (servo skipped)")
     except Exception as e:
         logger.warning("Raspberry Pi hardware not available (%s); running without GPIO/LEDs.", e)
         GPIO = None
@@ -161,9 +178,26 @@ def reset_ip_tracking():
         file.write(f"{get_current_date()}\n")
 
 
+def load_kisses_count():
+    """Load total kisses sent (persists across restarts during standby)."""
+    if os.path.exists(KISSES_COUNT_FILE):
+        try:
+            with open(KISSES_COUNT_FILE, "r") as file:
+                return int(file.read().strip() or 0)
+        except (ValueError, OSError):
+            logger.warning("Could not read kisses count file; starting at 0.")
+    return 0
+
+
+def save_kisses_count(count):
+    """Persist total kisses sent."""
+    with open(KISSES_COUNT_FILE, "w") as file:
+        file.write(str(count))
+
+
 def set_servo_angle(angle):
     """Set the servo to a specific angle."""
-    if servo is None:
+    if not servo_enabled() or servo is None:
         return
     duty_cycle = 2.5 + (angle / 18.0)  # Convert angle to duty cycle
     servo.ChangeDutyCycle(duty_cycle)
@@ -220,6 +254,41 @@ def flicker_birthday():
     turn_leds_off()
 
 
+def flicker_kiss():
+    """Soft pink twinkle when Apollo gets a kiss (strip is GRB order)."""
+    if not ENABLE_LIGHTS or strip is None or Color is None:
+        return
+
+    logger.info("Starting kiss twinkle effect")
+
+    kiss_colors = [
+        Color(180, 80, 255),    # pink
+        Color(220, 120, 255),   # light pink
+        Color(255, 150, 255),   # rose
+        Color(255, 200, 255),   # pale blush
+        Color(255, 100, 255),   # hot pink
+    ]
+
+    twinkle_duration = 3.0
+    start_time = time.time()
+
+    while time.time() - start_time < twinkle_duration:
+        num_to_twinkle = random.randint(10, 30)
+        twinkled = random.sample(range(strip.numPixels()), min(num_to_twinkle, strip.numPixels()))
+
+        for i in range(strip.numPixels()):
+            if i in twinkled:
+                strip.setPixelColor(i, random.choice(kiss_colors))
+            else:
+                strip.setPixelColor(i, Color(0, 0, 0))
+        strip.show()
+
+        time.sleep(0.1)
+
+    logger.info("Kiss twinkle effect complete")
+    turn_leds_off()
+
+
 def reset_treats():
     """Resets the treat count and IP tracking daily at 3 AM ET."""
     global treats_left
@@ -240,12 +309,40 @@ def home():
     treat_icons = "🌸 " * treats_left
     fan_art_metadata = load_fan_art_metadata()
     logger.info(f"Fan art metadata returned: {fan_art_metadata}")
-    return render_template("index.html", treats=treat_icons.strip(), fan_art=fan_art_metadata)
+    return render_template(
+        "index.html",
+        mode=APP_MODE,
+        treats=treat_icons.strip(),
+        kisses_sent=kisses_sent,
+        fan_art=fan_art_metadata,
+    )
+
+
+@app.route("/give_kiss", methods=["POST"])
+def give_kiss():
+    global kisses_sent
+    if not is_standby_mode():
+        return jsonify({"error": "Kisses are only available in standby mode."}), 403
+
+    kisses_sent += 1
+    save_kisses_count(kisses_sent)
+    threading.Thread(target=flicker_kiss).start()
+    return jsonify(
+        {
+            "kisses_sent": kisses_sent,
+            "message": "Apollo got a kiss! 💋",
+        }
+    )
 
 
 @app.route("/give_treat", methods=["POST"])
 def give_treat():
     global treats_left
+
+    if is_standby_mode():
+        return jsonify(
+            {"error": "Hardware is down for upgrades — send Apollo a kiss instead! 💋"}
+        ), 403
 
     # Get the user's IP address
     user_ip = request.remote_addr
@@ -270,7 +367,7 @@ def give_treat():
         # Start the treat dispensing and LED twinkle in a separate thread
         def treat_dispensing():
             # Servo dispensing logic FIRST
-            if ENABLE_SERVO:
+            if servo_enabled():
                 set_servo_angle(55)  # Rotate forward to dispense
                 time.sleep(1)
                 set_servo_angle(0)  # Return to rest
@@ -297,10 +394,14 @@ def thank_you():
 
 
 def startup():
+    global kisses_sent
     # Turn all LEDs off on startup
     if ENABLE_LIGHTS:
         turn_leds_off()
     reset_ip_tracking()
+    kisses_sent = load_kisses_count()
+    if is_standby_mode():
+        logger.info("Standby mode active — servo off, lights on, kisses enabled.")
 
 
 def cleanup():
