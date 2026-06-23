@@ -22,7 +22,7 @@ ENABLE_TREAT_SOUND = True
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 TREAT_SOUND_FILE = os.environ.get(
     "TREAT_SOUND_FILE",
-    os.path.join(_SCRIPT_DIR, "static", "sounds", "treat.wav"),
+    os.path.join(_SCRIPT_DIR, "static", "sounds", "treat.mp3"),
 )
 
 # "normal" = treat dispenser; "standby" = hardware down, kisses only
@@ -271,7 +271,7 @@ def dispense_treat():
 
 
 def play_treat_sound():
-    """Play treat chime (Mixkit 'Relaxing bell chime', static/sounds/treat.wav)."""
+    """Play treat sound (static/sounds/treat.mp3)."""
     if not ENABLE_TREAT_SOUND or not os.path.exists(TREAT_SOUND_FILE):
         return
     threading.Thread(target=_play_sound_file, daemon=True).start()
