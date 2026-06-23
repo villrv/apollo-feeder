@@ -14,13 +14,31 @@ from flask import Flask, jsonify, render_template, request
 #####
 
 DEFAULT_TREATS = 5
-ENABLE_SERVO = True
+ENABLE_STEPPER = True
 ENABLE_LIGHTS = True
 
 # "normal" = treat dispenser; "standby" = hardware down, kisses only
 APP_MODE = os.environ.get("APOLLO_MODE", "standby")
 KISSES_COUNT_FILE = "kisses_count.txt"
 KISS_COOLDOWN_SECONDS = 4
+
+# 28BYJ-48 stepper via ULN2003 (BCM pins → IN1–IN4)
+STEPPER_PINS = [17, 27, 22, 18]
+STEPS_PER_REVOLUTION = 4096  # half-step mode; tune if 16 treats don't land full circle
+DEGREES_PER_TREAT = 22.5
+STEPS_PER_TREAT = int(STEPS_PER_REVOLUTION * DEGREES_PER_TREAT / 360)
+STEP_DELAY_S = 0.002
+
+HALF_STEP_SEQUENCE = [
+    [1, 0, 0, 0],
+    [1, 1, 0, 0],
+    [0, 1, 0, 0],
+    [0, 1, 1, 0],
+    [0, 0, 1, 0],
+    [0, 0, 1, 1],
+    [0, 0, 0, 1],
+    [1, 0, 0, 1],
+]
 
 # LED strip configuration for Pi 3
 LED_COUNT = 100  # Number of LED pixels
@@ -44,13 +62,14 @@ treats_left = DEFAULT_TREATS
 kisses_sent = 0
 last_kiss_at = 0.0
 _kiss_light_lock = threading.Lock()
+_stepper_lock = threading.Lock()
+_stepper_sequence_index = 0
 
 # File to store IP addresses of users who have fed Apollo today
 IP_TRACKING_FILE = "fed_ip_addresses.txt"
 
 # Raspberry Pi-only: set APOLLO_HEADLESS=1 on a VPS if you prefer to skip probing hardware.
 GPIO = None
-servo = None
 strip = None
 Color = None
 
@@ -59,49 +78,61 @@ def is_standby_mode():
     return APP_MODE.lower() == "standby"
 
 
-def servo_enabled():
-    return ENABLE_SERVO and not is_standby_mode()
+def stepper_enabled():
+    return ENABLE_STEPPER and not is_standby_mode()
+
+
+def leds_available():
+    """LED strip shares GPIO 18 with stepper IN4 — skip when stepper is wired."""
+    return ENABLE_LIGHTS and LED_PIN not in STEPPER_PINS
 
 
 def init_hardware():
-    """Attach WS281x strip on a Pi; servo only when not in standby. No-op on VPS / missing libs."""
-    global GPIO, servo, strip, Color
+    """Attach stepper and/or WS281x strip on a Pi. No-op on VPS / missing libs."""
+    global GPIO, strip, Color
     force_headless = os.environ.get("APOLLO_HEADLESS", "").lower() in ("1", "true", "yes")
     if force_headless:
         logger.info("APOLLO_HEADLESS: GPIO and LED strip disabled.")
         return
     try:
         import RPi.GPIO as GPIO_mod
-        from rpi_ws281x import Color as NeoColor
-        from rpi_ws281x import PixelStrip
 
-        Color = NeoColor
         GPIO_mod.setmode(GPIO_mod.BCM)
-        if is_standby_mode():
-            logger.info("Standby mode: servo disabled, LED strip enabled.")
-            srv = None
-        else:
-            GPIO_mod.setup(7, GPIO_mod.OUT)
-            srv = GPIO_mod.PWM(7, 50)
-            srv.start(0)
-        st = PixelStrip(
-            LED_COUNT,
-            LED_PIN,
-            LED_FREQ_HZ,
-            LED_DMA,
-            LED_INVERT,
-            LED_BRIGHTNESS,
-            LED_CHANNEL,
-        )
-        st.begin()
+        GPIO_mod.setwarnings(False)
+
+        if stepper_enabled():
+            for pin in STEPPER_PINS:
+                GPIO_mod.setup(pin, GPIO_mod.OUT)
+                GPIO_mod.output(pin, GPIO_mod.LOW)
+            logger.info("Stepper initialized on GPIO %s.", STEPPER_PINS)
+
+        st = None
+        neo_color = None
+        if leds_available():
+            from rpi_ws281x import Color as NeoColor
+            from rpi_ws281x import PixelStrip
+
+            neo_color = NeoColor
+            st = PixelStrip(
+                LED_COUNT,
+                LED_PIN,
+                LED_FREQ_HZ,
+                LED_DMA,
+                LED_INVERT,
+                LED_BRIGHTNESS,
+                LED_CHANNEL,
+            )
+            st.begin()
+            logger.info("LED strip initialized on GPIO %s.", LED_PIN)
+        elif ENABLE_LIGHTS:
+            logger.info("LED strip skipped — GPIO %s used by stepper.", LED_PIN)
+
         GPIO = GPIO_mod
-        servo = srv
+        Color = neo_color
         strip = st
-        logger.info("LED strip initialized%s.", "" if srv else " (servo skipped)")
     except Exception as e:
         logger.warning("Raspberry Pi hardware not available (%s); running without GPIO/LEDs.", e)
         GPIO = None
-        servo = None
         strip = None
         Color = None
 
@@ -198,19 +229,39 @@ def save_kisses_count(count):
         file.write(str(count))
 
 
-def set_servo_angle(angle):
-    """Set the servo to a specific angle."""
-    if not servo_enabled() or servo is None:
+def _set_stepper_coils(state):
+    for pin, level in zip(STEPPER_PINS, state):
+        GPIO.output(pin, GPIO.HIGH if level else GPIO.LOW)
+
+
+def stepper_off():
+    if GPIO is None:
         return
-    duty_cycle = 2.5 + (angle / 18.0)  # Convert angle to duty cycle
-    servo.ChangeDutyCycle(duty_cycle)
-    time.sleep(0.5)  # Give the servo time to reach the position
-    servo.ChangeDutyCycle(0)  # Stop the PWM signal
+    _set_stepper_coils([0, 0, 0, 0])
+
+
+def step_forward(steps):
+    """Advance the stepper forward by the given number of half-steps."""
+    global _stepper_sequence_index
+    if not stepper_enabled() or GPIO is None or steps <= 0:
+        return
+
+    with _stepper_lock:
+        for _ in range(steps):
+            _stepper_sequence_index = (_stepper_sequence_index + 1) % len(HALF_STEP_SEQUENCE)
+            _set_stepper_coils(HALF_STEP_SEQUENCE[_stepper_sequence_index])
+            time.sleep(STEP_DELAY_S)
+        stepper_off()
+
+
+def dispense_treat():
+    """Rotate the drum forward one treat slot (22.5°)."""
+    step_forward(STEPS_PER_TREAT)
 
 
 def turn_leds_off():
     """Turn all LEDs off."""
-    if not ENABLE_LIGHTS or strip is None or Color is None:
+    if not leds_available() or strip is None or Color is None:
         return
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, Color(0, 0, 0))  # Off
@@ -219,7 +270,7 @@ def turn_leds_off():
 
 def flicker_birthday():
     """Party twinkle: multicolor for birthday (strip is GRB order)."""
-    if not ENABLE_LIGHTS or strip is None or Color is None:
+    if not leds_available() or strip is None or Color is None:
         return
     
     logger.info("Starting birthday twinkle effect")
@@ -259,7 +310,7 @@ def flicker_birthday():
 
 def flicker_kiss():
     """Soft pink twinkle when Apollo gets a kiss (strip is GRB order)."""
-    if not ENABLE_LIGHTS or strip is None or Color is None:
+    if not leds_available() or strip is None or Color is None:
         return
     if not _kiss_light_lock.acquire(blocking=False):
         return
@@ -387,14 +438,8 @@ def give_treat():
 
         # Start the treat dispensing and LED twinkle in a separate thread
         def treat_dispensing():
-            # Servo dispensing logic FIRST
-            if servo_enabled():
-                set_servo_angle(55)  # Rotate forward to dispense
-                time.sleep(1)
-                set_servo_angle(0)  # Return to rest
-                time.sleep(1)
-            
-            # Then birthday party twinkle (turns off automatically after)
+            if stepper_enabled():
+                dispense_treat()
             flicker_birthday()
 
         # Run treat dispensing asynchronously
@@ -417,21 +462,27 @@ def thank_you():
 def startup():
     global kisses_sent
     # Turn all LEDs off on startup
-    if ENABLE_LIGHTS:
+    if leds_available():
         turn_leds_off()
     reset_ip_tracking()
     kisses_sent = load_kisses_count()
     if is_standby_mode():
-        logger.info("Standby mode active — servo off, lights on, kisses enabled.")
+        logger.info("Standby mode active — stepper off, kisses enabled.")
+    else:
+        logger.info(
+            "Treat mode active — %s steps (%.1f°) per treat.",
+            STEPS_PER_TREAT,
+            DEGREES_PER_TREAT,
+        )
 
 
 def cleanup():
     scheduler.shutdown()
-    if servo is not None:
+    if GPIO is not None:
         try:
-            servo.stop()
+            stepper_off()
         except Exception:
-            logger.debug("servo.stop() skipped", exc_info=True)
+            logger.debug("stepper_off() skipped", exc_info=True)
     if GPIO is not None:
         try:
             GPIO.cleanup()
