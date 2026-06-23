@@ -28,6 +28,7 @@ STEPS_PER_REVOLUTION = 4096  # half-step mode; tune if 16 treats don't land full
 DEGREES_PER_TREAT = 22.5
 STEPS_PER_TREAT = int(STEPS_PER_REVOLUTION * DEGREES_PER_TREAT / 360)
 STEP_DELAY_S = 0.002
+STEPPER_DIRECTION = -1  # -1 reverses rotation; use 1 for the other way
 
 HALF_STEP_SEQUENCE = [
     [1, 0, 0, 0],
@@ -248,7 +249,9 @@ def step_forward(steps):
 
     with _stepper_lock:
         for _ in range(steps):
-            _stepper_sequence_index = (_stepper_sequence_index + 1) % len(HALF_STEP_SEQUENCE)
+            _stepper_sequence_index = (
+                _stepper_sequence_index + STEPPER_DIRECTION
+            ) % len(HALF_STEP_SEQUENCE)
             _set_stepper_coils(HALF_STEP_SEQUENCE[_stepper_sequence_index])
             time.sleep(STEP_DELAY_S)
         stepper_off()
