@@ -10,9 +10,9 @@
             text-align: center;
             padding: 50px;
             background:
-                radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255, 236, 244, 0.95), transparent 50%),
-                linear-gradient(to bottom, #fef8fb 0%, #fdeef4 35%, #f5e8f0 68%, #e8f4ec 100%);
-            color: #2d2d2d;
+                radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255, 255, 255, 0.95), transparent 50%),
+                linear-gradient(to bottom, #f8f9ff 0%, #eef2ff 35%, #fff5f5 68%, #f0f4ff 100%);
+            color: #1a237e;
             min-height: 100vh;
             margin: 0;
             position: relative;
@@ -24,10 +24,10 @@
             position: fixed;
             inset: 0;
             background-image:
-                radial-gradient(circle at 15% 20%, rgba(255, 192, 212, 0.35) 0%, transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(255, 183, 197, 0.3) 0%, transparent 22%),
-                radial-gradient(circle at 70% 75%, rgba(255, 218, 230, 0.4) 0%, transparent 30%),
-                radial-gradient(circle at 25% 80%, rgba(255, 200, 210, 0.25) 0%, transparent 28%);
+                radial-gradient(circle at 15% 20%, rgba(183, 28, 28, 0.12) 0%, transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(21, 101, 192, 0.12) 0%, transparent 22%),
+                radial-gradient(circle at 70% 75%, rgba(255, 255, 255, 0.5) 0%, transparent 30%),
+                radial-gradient(circle at 25% 80%, rgba(21, 101, 192, 0.1) 0%, transparent 28%);
             z-index: 0;
         }
 
@@ -38,14 +38,14 @@
 
         h1 {
             font-family: 'Georgia', serif, Arial, sans-serif;
-            color: #c2185b;
-            text-shadow: 1px 2px 0 rgba(255, 255, 255, 0.6);
+            color: #b71c1c;
+            text-shadow: 1px 2px 0 rgba(255, 255, 255, 0.8);
             font-size: 2.4em;
             margin-bottom: 20px;
             font-weight: bold;
             padding: 20px;
-            border-top: 4px solid #f8bbd9;
-            border-bottom: 4px solid #ce93d8;
+            border-top: 4px solid #1565c0;
+            border-bottom: 4px solid #c62828;
             display: inline-block;
             margin-top: 20px;
         }
@@ -82,7 +82,7 @@
 
         #treat-count {
             font-size: 28px;
-            color: #ad1457;
+            color: #1565c0;
             text-shadow: none;
             font-weight: bold;
         }
@@ -445,67 +445,67 @@
         }
     }
 
-    /* May / cherry blossom — soft sakura + early summer */
-    .sakura-button {
+    /* July 4th — red, white & blue */
+    .fourth-button {
         position: relative;
         display: block;
         width: 200px;
         height: 56px;
         margin: 20px auto;
-        background: linear-gradient(135deg, #fff5f8 0%, #ffc9d9 45%, #f8bbd9 100%);
+        background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 35%, #ffcdd2 70%, #bbdefb 100%);
         border-radius: 28px;
-        border: 2px solid #f48fb1;
+        border: 2px solid #1565c0;
         font-size: 17px;
         font-weight: bold;
         text-transform: uppercase;
-        color: #880e4f;
+        color: #b71c1c;
         letter-spacing: 1px;
         cursor: pointer;
         transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s ease;
-        box-shadow: 0 6px 16px rgba(194, 24, 91, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+        box-shadow: 0 6px 16px rgba(21, 101, 192, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.9);
         overflow: hidden;
     }
 
-    .sakura-button:hover {
-        background: linear-gradient(135deg, #ffffff 0%, #ffd6e5 40%, #f9b4cc 100%);
+    .fourth-button:hover {
+        background: linear-gradient(135deg, #ffffff 0%, #bbdefb 40%, #ef9a9a 75%, #90caf9 100%);
         transform: scale(1.04);
-        box-shadow: 0 8px 22px rgba(194, 24, 91, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+        box-shadow: 0 8px 22px rgba(183, 28, 28, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.95);
     }
 
-    .sakura-button:active {
+    .fourth-button:active {
         transform: scale(0.98) translateY(2px);
-        box-shadow: 0 3px 10px rgba(194, 24, 91, 0.2);
+        box-shadow: 0 3px 10px rgba(21, 101, 192, 0.2);
     }
 
-    .sakura-button::before,
-    .sakura-button::after {
+    .fourth-button::before,
+    .fourth-button::after {
         content: "";
         position: absolute;
         inset: auto;
         pointer-events: none;
     }
 
-    .sakura-button::before {
-        content: "🌸";
+    .fourth-button::before {
+        content: "⭐";
         left: 14%;
         top: 50%;
         transform: translateY(-50%);
         font-size: 15px;
-        opacity: 0.85;
-        animation: sakuraBob 2.2s ease-in-out infinite;
+        opacity: 0.9;
+        animation: fourthBob 2.2s ease-in-out infinite;
     }
 
-    .sakura-button::after {
-        content: "🌸";
+    .fourth-button::after {
+        content: "🎆";
         right: 12%;
         top: 50%;
         transform: translateY(-50%);
         font-size: 14px;
-        opacity: 0.75;
-        animation: sakuraBob 2.2s ease-in-out infinite 0.55s;
+        opacity: 0.85;
+        animation: fourthBob 2.2s ease-in-out infinite 0.55s;
     }
 
-    @keyframes sakuraBob {
+    @keyframes fourthBob {
         0%, 100% { transform: translateY(-50%) rotate(-6deg); opacity: 0.6; }
         50% { transform: translateY(-58%) rotate(6deg); opacity: 1; }
     }
@@ -548,12 +548,12 @@
 
     <button id="kiss-button" class="valentine-button">Send Kiss</button>
     {% else %}
-    <h1>Apollo is a big brother!</h1>
+    <h1>Happy 4th of July!</h1>
     <p>
         Remaining Treats: <span id="treat-count">{{ treats }}</span>
     </p>
 
-    <button id="feed-button" class="sakura-button">Give Treat</button>
+    <button id="feed-button" class="fourth-button">Give Treat</button>
     {% endif %}
 
     <div id="popup">
@@ -564,9 +564,9 @@
     <!-- Apollo Image -->
     <div style="margin-top: 30px; text-align: center;">
         {% if mode == 'standby' %}
-        <img src="{{ url_for('static', filename='apollo-standby.png') }}" alt="Apollo — standby" class="apollo-image" style="max-width: 100%; height: auto; border-radius: 15px; box-shadow: 0 10px 28px rgba(194, 24, 91, 0.2); border: 3px solid rgba(248, 187, 217, 0.9);" onerror="this.onerror=null; this.src='{{ url_for('static', filename='apollo-brother.png') }}';">
+        <img src="{{ url_for('static', filename='apollo-standby.png') }}" alt="Apollo — standby" class="apollo-image" style="max-width: 100%; height: auto; border-radius: 15px; box-shadow: 0 10px 28px rgba(21, 101, 192, 0.2); border: 3px solid rgba(21, 101, 192, 0.5);" onerror="this.onerror=null; this.src='{{ url_for('static', filename='apollo-fourth.png') }}';">
         {% else %}
-        <img src="{{ url_for('static', filename='apollo-brother.png') }}" alt="Apollo — proud big brother" class="apollo-image" style="max-width: 100%; height: auto; border-radius: 15px; box-shadow: 0 10px 28px rgba(194, 24, 91, 0.2); border: 3px solid rgba(248, 187, 217, 0.9);">
+        <img src="{{ url_for('static', filename='apollo-fourth.png') }}" alt="Apollo celebrates the 4th of July" class="apollo-image" style="max-width: 100%; height: auto; border-radius: 15px; box-shadow: 0 10px 28px rgba(183, 28, 28, 0.2); border: 3px solid rgba(21, 101, 192, 0.7);">
         {% endif %}
     </div>
 
