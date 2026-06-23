@@ -1,6 +1,7 @@
 import atexit
 import os
 import random
+import subprocess
 import threading
 import time
 import csv
@@ -16,6 +17,13 @@ from flask import Flask, jsonify, render_template, request
 DEFAULT_TREATS = 5
 ENABLE_STEPPER = True
 ENABLE_LIGHTS = True
+ENABLE_TREAT_SOUND = True
+
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+TREAT_SOUND_FILE = os.environ.get(
+    "TREAT_SOUND_FILE",
+    os.path.join(_SCRIPT_DIR, "static", "sounds", "treat.wav"),
+)
 
 # "normal" = treat dispenser; "standby" = hardware down, kisses only
 APP_MODE = os.environ.get("APOLLO_MODE", "normal")
@@ -262,6 +270,26 @@ def dispense_treat():
     step_forward(STEPS_PER_TREAT)
 
 
+def play_treat_sound():
+    """Play treat chime (Mixkit 'Relaxing bell chime', static/sounds/treat.wav)."""
+    if not ENABLE_TREAT_SOUND or not os.path.exists(TREAT_SOUND_FILE):
+        return
+    threading.Thread(target=_play_sound_file, daemon=True).start()
+
+
+def _play_sound_file():
+    path = TREAT_SOUND_FILE
+    try:
+        if path.lower().endswith(".wav"):
+            subprocess.run(["aplay", "-q", path], check=False, timeout=10)
+        elif path.lower().endswith(".mp3"):
+            subprocess.run(["mpg123", "-q", path], check=False, timeout=10)
+    except FileNotFoundError:
+        logger.warning("No audio player found (install aplay or mpg123).")
+    except subprocess.TimeoutExpired:
+        logger.warning("Treat sound playback timed out.")
+
+
 def turn_leds_off():
     """Turn all LEDs off."""
     if not leds_available() or strip is None or Color is None:
@@ -441,6 +469,7 @@ def give_treat():
 
         # Start the treat dispensing and LED twinkle in a separate thread
         def treat_dispensing():
+            play_treat_sound()
             if stepper_enabled():
                 dispense_treat()
             flicker_birthday()
