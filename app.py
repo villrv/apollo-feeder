@@ -18,7 +18,7 @@ ENABLE_STEPPER = True
 ENABLE_LIGHTS = True
 
 # "normal" = treat dispenser; "standby" = hardware down, kisses only
-APP_MODE = os.environ.get("APOLLO_MODE", "standby")
+APP_MODE = os.environ.get("APOLLO_MODE", "normal")
 KISSES_COUNT_FILE = "kisses_count.txt"
 KISS_COOLDOWN_SECONDS = 4
 
