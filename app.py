@@ -396,7 +396,7 @@ scheduler.start()
 @app.route("/")
 def home():
     logger.info("=== HOME ROUTE CALLED ===")
-    treat_icons = "⭐ " * treats_left
+    treat_icons = "🐚 " * treats_left
     fan_art_metadata = load_fan_art_metadata()
     logger.info(f"Fan art metadata returned: {fan_art_metadata}")
     return render_template(
@@ -478,7 +478,7 @@ def give_treat():
         threading.Thread(target=treat_dispensing).start()
 
         # Immediately respond with a success message
-        treat_icons = "⭐ " * treats_left
+        treat_icons = "🐚 " * treats_left
         return jsonify({"treats_left": treat_icons.strip(), "message": message})
 
     else:
