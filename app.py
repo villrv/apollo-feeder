@@ -339,6 +339,44 @@ def flicker_birthday():
     turn_leds_off()
 
 
+def flicker_halloween():
+    """Spooky twinkle: orange, purple, and green (strip is GRB order)."""
+    if not leds_available() or strip is None or Color is None:
+        return
+
+    logger.info("Starting Halloween twinkle effect")
+
+    # NOTE: This LED strip uses GRB channel order (not RGB)
+    # Color(R, G, B) displays as (G, R, B) on the strip
+    halloween_colors = [
+        Color(140, 255, 0),     # orange
+        Color(80, 255, 0),      # deep orange
+        Color(0, 160, 220),     # purple
+        Color(0, 100, 255),     # violet
+        Color(180, 0, 0),       # green
+        Color(200, 255, 0),     # gold
+    ]
+
+    twinkle_duration = 5.0
+    start_time = time.time()
+
+    while time.time() - start_time < twinkle_duration:
+        num_to_twinkle = random.randint(8, 25)
+        twinkled = random.sample(range(strip.numPixels()), min(num_to_twinkle, strip.numPixels()))
+
+        for i in range(strip.numPixels()):
+            if i in twinkled:
+                strip.setPixelColor(i, random.choice(halloween_colors))
+            else:
+                strip.setPixelColor(i, Color(0, 0, 0))
+        strip.show()
+
+        time.sleep(0.12)
+
+    logger.info("Halloween twinkle effect complete")
+    turn_leds_off()
+
+
 def flicker_kiss():
     """Soft pink twinkle when Apollo gets a kiss (strip is GRB order)."""
     if not leds_available() or strip is None or Color is None:
@@ -396,7 +434,7 @@ scheduler.start()
 @app.route("/")
 def home():
     logger.info("=== HOME ROUTE CALLED ===")
-    treat_icons = "🐚 " * treats_left
+    treat_icons = "🎃 " * treats_left
     fan_art_metadata = load_fan_art_metadata()
     logger.info(f"Fan art metadata returned: {fan_art_metadata}")
     return render_template(
@@ -472,13 +510,13 @@ def give_treat():
             play_treat_sound()
             if stepper_enabled():
                 dispense_treat()
-            flicker_birthday()
+            flicker_halloween()
 
         # Run treat dispensing asynchronously
         threading.Thread(target=treat_dispensing).start()
 
         # Immediately respond with a success message
-        treat_icons = "🐚 " * treats_left
+        treat_icons = "🎃 " * treats_left
         return jsonify({"treats_left": treat_icons.strip(), "message": message})
 
     else:
